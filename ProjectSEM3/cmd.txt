@@ -1,0 +1,2 @@
+﻿// convert table from data to model : Entities is Fodel 
+Scaffold-DbContext  "Data Source=SOUTH\SQLEXPRESS;Initial Catalog=Project_SEM3;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Force
