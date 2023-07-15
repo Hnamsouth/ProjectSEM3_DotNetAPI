@@ -1,0 +1,126 @@
+﻿USE Project_SEM3
+GO
+
+CREATE TABLE Categories (
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Name nvarchar(255) not null unique
+)
+GO
+
+CREATE TABLE Products (
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Name nvarchar(255) not null ,
+	Price decimal(12,4) not null,
+	Description text ,
+	category_id int FOREIGN KEY REFERENCES Categories(Id)
+)
+
+GO 
+CREATE TABLE ProductColor (
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Img varchar(255) NOT NULL,
+	ColorName varchar(100),
+	product_id int FOREIGN KEY REFERENCES Products(Id)
+)
+GO 
+
+CREATE TABLE Size(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Name varchar(10) NOT NULL UNIQUE
+)
+GO
+CREATE TABLE ProductSize (
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Qty int NOT NULL DEFAULT(0),
+	size_id int FOREIGN KEY REFERENCES Size(Id),
+	productColor_id int FOREIGN KEY REFERENCES ProductColor(Id)
+)
+GO 
+CREATE TABLE Users(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Username varchar(100) NOT NULL UNIQUE,
+	Email varchar(255) NOT NULL UNIQUE,
+	Password text NOT NULL 
+)
+
+GO
+CREATE TABLE UserInfo(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Name varchar(255) NOT NULL,
+	Phone varchar(20) ,
+	Address nvarchar(255),
+	Birthday Date,
+	Country varchar(100),
+	Gender bit DEFAULT(0),
+	user_id int FOREIGN KEY REFERENCES Users(Id)
+)
+
+GO 
+CREATE TABLE Admins(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Role varchar(100) NOT NULL UNIQUE,
+	user_id int FOREIGN KEY REFERENCES Users(Id)
+);
+GO
+CREATE TABLE Carts(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	buy_qty int NOT NULL,
+	productColor_id int FOREIGN KEY REFERENCES ProductColor(Id),
+	product_id int FOREIGN KEY REFERENCES Products(Id),
+	productSize_id int FOREIGN KEY REFERENCES ProductSize(Id),
+	user_id int FOREIGN KEY REFERENCES Users(Id)
+)
+
+GO 
+CREATE TABLE Favouries(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	productColor_id int FOREIGN KEY REFERENCES ProductColor(Id),
+	product_id int FOREIGN KEY REFERENCES Products(Id),
+	user_id int FOREIGN KEY REFERENCES Users(Id)
+);
+GO 
+CREATE TABLE Orders(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Date date NOT NULL DEFAULT(GETDATE()),
+	Status tinyint NOT NULL,
+	Ship_Code varchar(255),
+	user_id int FOREIGN KEY REFERENCES Users(Id)
+);
+GO
+CREATE TABLE OrderDetail(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Qty int NOT NULL,
+	productColor_id int FOREIGN KEY REFERENCES ProductColor(Id),
+	product_id int FOREIGN KEY REFERENCES Products(Id),
+	productSize_id int FOREIGN KEY REFERENCES ProductSize(Id),
+	order_id int FOREIGN KEY REFERENCES Orders(Id)
+);
+GO
+CREATE TABLE Payment(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Name nvarchar(255) NOT NULL,
+	Address nvarchar(255) NOT NULL,
+	PostalCode int NOT NULL,
+	Email varchar(255) NOT NULL,
+	Phone varchar(20) NOT NULL,
+
+	order_id int FOREIGN KEY REFERENCES Orders(Id),
+	user_id int FOREIGN KEY REFERENCES Users(Id)
+);
+GO
+CREATE TABLE UserCard(
+	CardNumber int PRIMARY KEY NOT NULL,
+	NameOnCard varchar(255) NOT NULL,
+	ExpiryDate varchar(5) NOT NULL,
+	CVC tinyint NOT NULL,
+	user_id int FOREIGN KEY REFERENCES Users(Id)
+)
+GO
+CREATE TABLE ProductReview(
+	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	Comment text,
+	Rate int NOT NULL,
+	product_id int FOREIGN KEY REFERENCES Products(Id),
+	user_id int FOREIGN KEY REFERENCES Users(Id),
+	created_at datetime NOT NULL DEFAULT(GETDATE())
+);

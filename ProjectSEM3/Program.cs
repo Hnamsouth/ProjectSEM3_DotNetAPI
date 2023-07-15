@@ -1,5 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
+
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using dotenv.net;
+
+
+DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // add cors
@@ -48,3 +58,5 @@ app.MapControllers();
 app.UseCors();
 
 app.Run();
+
+

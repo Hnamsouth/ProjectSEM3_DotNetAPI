@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProjectSEM3.DTOs;
 using ProjectSEM3.Entities;
+using ProjectSEM3.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,32 +21,67 @@ namespace ProjectSEM3.Controllers
         }
 
         // GET: api/<CategoryController>
-        [HttpGet]
-        public IActionResult Get(int? id)
+        [HttpGet,
+            Route("get")]
+        async public Task<IActionResult> Get(int? id)
         {
-            var categories = _context.Categories.ToList();
-            return Ok();
+            
+            if (id == null)
+            {
+                var categories = await _context.Categories.ToListAsync();
+                return Ok(categories);
+            }
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null) { return NotFound(); }
+            return Ok(category);
         }
 
         // POST api/<CategoryController>
         [HttpPost]
-        public IActionResult Post([FromBody] string value)
+        async public Task<IActionResult> Create(CategoryDto data)
         {
-            return Ok();
+            if (ModelState.IsValid)
+            {
+                _context.Categories.Add(new Category { Name = data.Name });
+                await _context.SaveChangesAsync();
+                return Created($"/get?id={data.Id}",data);
+            }
+            return BadRequest();
         }
 
         // PUT api/<CategoryController>/5
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string value)
+        [HttpPut]
+        async public Task<IActionResult> Update(Category data)
         {
-            return Ok();
+            if (ModelState.IsValid)
+            {
+                _context.Categories.Update(data);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            return BadRequest();
         }
 
         // DELETE api/<CategoryController>/5
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete]
+        async public Task<IActionResult> Delete(int id)
         {
-            return Ok();
+            var c = _context.Categories.Find(id);
+            if(c != null)
+            {
+                _context.Categories.Remove(c);
+               await  _context.SaveChangesAsync();
+            }
+            return NotFound();
+        }
+
+        [HttpGet,Route("upload")]
+        async public Task<IActionResult> Upload()
+        {
+            var up = new UploadImg();
+            var rs = await up.Upload(null,null,null);
+            Console.WriteLine(rs);
+            return Ok(rs);
         }
     }
 }
