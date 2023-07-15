@@ -75,7 +75,7 @@ namespace ProjectSEM3.Controllers
             return NotFound();
         }
 
-        [HttpGet,Route("upload")]
+        [HttpGet,Route("upload-demo")]
         async public Task<IActionResult> Upload()
         {
             var up = new UploadImg();
