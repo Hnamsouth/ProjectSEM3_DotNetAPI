@@ -11,7 +11,10 @@ using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.Controllers
 {
-    public class OrderController : Controller
+
+    [Route("api/order")]
+    [ApiController]
+    public class OrderController : ControllerBase
     {
         private readonly ProjectSem3Context _context;
 

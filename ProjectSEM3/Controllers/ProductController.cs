@@ -12,7 +12,9 @@ using ProjectSEM3.Services;
 
 namespace ProjectSEM3.Controllers
 {
-    public class ProductController : Controller
+    [Route("api/product")]
+    [ApiController]
+    public class ProductController : ControllerBase
     {
 
         private readonly ProjectSem3Context _context;
