@@ -10,9 +10,6 @@ namespace ProjectSEM3.DTOs
 
         public virtual List<Product>? Products { get; set; } = new List<Product>();
         public virtual Product Product { get; set; }
-        //hehehehehhe
-        //hahahahhahaha
-        //hshhsahdh
-        //1111
+    
     }
 }
