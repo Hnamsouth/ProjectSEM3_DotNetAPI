@@ -12,6 +12,7 @@ namespace ProjectSEM3.DTOs
         public virtual Product Product { get; set; }
         //hehehehehhe
         //hahahahhahaha
-        //asfbahbfhas
+        //hshhsahdh
+        //1111
     }
 }
