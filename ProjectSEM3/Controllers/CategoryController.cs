@@ -25,10 +25,9 @@ namespace ProjectSEM3.Controllers
             Route("get")]
         async public Task<IActionResult> Get(int? id)
         {
-            
             if (id == null)
             {
-                var categories = await _context.Categories.Include(e => e.Products).ToListAsync();
+                var categories = await _context.Categories.Include(e=>e.Products).ToListAsync();
                 return Ok(categories);
             }
             var category = await _context.Categories.FindAsync(id);

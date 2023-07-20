@@ -45,7 +45,7 @@ namespace ProjectSEM3.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Products.Add(new Entities.Product { Name = data.Name, Price = data.Price, Description = data.Description, CategoryId = data.CategoryId});
+                _context.Products.Add(new Product { Name = data.Name, Price = data.Price, Description = data.Description, CategoryId = data.CategoryId});
                 await _context.SaveChangesAsync();
                 return Created($"/get?id={data.Id}", data);
             }
@@ -53,7 +53,7 @@ namespace ProjectSEM3.Controllers
         }
 
         [HttpPut]
-        async public Task<IActionResult> Update(Entities.Product data)
+        async public Task<IActionResult> Update(Product data)
         {
             if (ModelState.IsValid)
             {

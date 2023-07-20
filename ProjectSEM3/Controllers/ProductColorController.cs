@@ -13,7 +13,7 @@ using ProjectSEM3.Services;
 namespace ProjectSEM3.Controllers
 {
     [ApiController]
-    [Route("api/[product-color]")]
+    [Route("api/product-color")]
     public class ProductColorController : ControllerBase
     {
 
