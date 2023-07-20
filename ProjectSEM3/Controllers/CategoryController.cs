@@ -28,10 +28,11 @@ namespace ProjectSEM3.Controllers
             
             if (id == null)
             {
-                var categories = await _context.Categories.ToListAsync();
+                var categories = await _context.Categories.Include(e => e.Products).ToListAsync();
                 return Ok(categories);
             }
             var category = await _context.Categories.FindAsync(id);
+            
             if (category == null) { return NotFound(); }
             return Ok(category);
         }
