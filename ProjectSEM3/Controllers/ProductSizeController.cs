@@ -12,9 +12,9 @@ using ProjectSEM3.Services;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/product-size")]
     [ApiController]
-    public class ProductSizeController : Controller
+    public class ProductSizeController : ControllerBase
     {
 
         private readonly ProjectSem3Context _context;

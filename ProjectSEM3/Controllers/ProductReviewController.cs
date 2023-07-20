@@ -11,9 +11,9 @@ using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/product-review")]
     [ApiController]
-    public class ProductReviewController : Controller
+    public class ProductReviewController : ControllerBase
     {
         private readonly ProjectSem3Context _context;
 

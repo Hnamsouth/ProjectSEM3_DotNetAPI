@@ -10,7 +10,7 @@ using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/size")]
     [ApiController]
     public class SizesController : ControllerBase
     {
