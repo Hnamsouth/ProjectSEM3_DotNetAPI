@@ -12,13 +12,14 @@ using ProjectSEM3.Services;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/product-size")]
     [ApiController]
+    [Route("api/[controller]")]
+    public class ProductColorController : Controller
     {
 
         private readonly ProjectSem3Context _context;
 
-        public ProductSizeController(ProjectSem3Context context)
+        public ProductColorController(ProjectSem3Context context)
         {
             _context = context;
         }
@@ -26,21 +27,22 @@ namespace ProjectSEM3.Controllers
         [HttpGet, Route("get")]
         async public Task<IActionResult> Get(int? id)
         {
-            var ps = await _context.ProductSizes.ToListAsync();
-            if (ps == null) return NotFound();
+            var pc = await _context.ProductColors.ToListAsync();
+            if (pc == null) return NotFound();
             if (id != null)
             {
-                var pss = await _context.ProductSizes.FindAsync(id);
-                return Ok(pss);
+                var pcs = await _context.ProductColors.FindAsync(id);
+                return Ok(pcs);
             }
-            return Ok(ps);
+            return Ok(pc);
         }
 
         [HttpPost]
-        async public Task<IActionResult> Create(ProductSizeDto data)
+        async public Task<IActionResult> Create(ProductColorDto data)
         {
             if (ModelState.IsValid)
             {
+                _context.ProductColors.Add(new ProductColor { Img = data.Img, ColorName = data.ColorName, ProductId = data.ProductId }) ;
                 await _context.SaveChangesAsync();
                 return Created($"/get?id={data.Id}", data);
 
@@ -49,11 +51,11 @@ namespace ProjectSEM3.Controllers
         }
 
         [HttpPut]
-        async public Task<IActionResult> Update(ProductSize data)
+        async public Task<IActionResult> Update(ProductColor data)
         {
             if (ModelState.IsValid)
             {
-                _context.ProductSizes.Update(data);
+                _context.ProductColors.Update(data);
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
@@ -63,13 +65,22 @@ namespace ProjectSEM3.Controllers
         [HttpDelete]
         async public Task<IActionResult> Delete(int id)
         {
-            var ps = _context.ProductSizes.Find(id);
-            if (ps != null)
+            var pc = _context.ProductColors.Find(id);
+            if (pc != null)
             {
-                _context.ProductSizes.Remove(ps);
+                _context.ProductColors.Remove(pc);
                 await _context.SaveChangesAsync();
             }
             return NotFound();
+        }
+
+        [HttpGet, Route("upload-demo")]
+        async public Task<IActionResult> Upload()
+        {
+            var up = new UploadImg();
+            var rs = await up.Upload(null, null, null);
+            Console.WriteLine(rs);
+            return Ok(rs);
         }
     }
 }
