@@ -37,7 +37,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
-    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("PROJECT_SEM3"))
+    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Default"))
 );
 
 var app = builder.Build();
