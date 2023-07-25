@@ -1,14 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-
-
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 using dotenv.net;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,8 +35,33 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
-    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Server"))
+    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Local-south"))
 );
+
+// add authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        ValidIssuer = builder.Configuration["Jwt:Issure"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+
+// add authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SuperAdmin", policy => policy.RequireUserName("adidosadmin"));
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("Staff", policy => policy.RequireRole("Staff"));
+
+    options.AddPolicy("Auth", policy => policy.RequireAuthenticatedUser());
+});
 
 var app = builder.Build();
 
@@ -50,6 +73,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+// use authentication
+app.UseAuthentication();
 
 app.UseAuthorization();
 
