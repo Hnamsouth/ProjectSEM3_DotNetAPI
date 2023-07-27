@@ -115,6 +115,63 @@ namespace ProjectSEM3.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("ProjectSEM3.Entities.Discount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Coupon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("DiscountPercent")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Discount");
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.DiscountProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("DiscountProduct");
+                });
+
             modelBuilder.Entity("ProjectSEM3.Entities.Favoury", b =>
                 {
                     b.Property<int>("Id")
@@ -145,6 +202,46 @@ namespace ProjectSEM3.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Favouries");
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.News", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ShortDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.ToTable("News");
                 });
 
             modelBuilder.Entity("ProjectSEM3.Entities.Order", b =>
@@ -583,6 +680,21 @@ namespace ProjectSEM3.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ProjectSEM3.Entities.DiscountProduct", b =>
+                {
+                    b.HasOne("ProjectSEM3.Entities.Discount", "Discount")
+                        .WithMany("DiscountProducts")
+                        .HasForeignKey("DiscountId");
+
+                    b.HasOne("ProjectSEM3.Entities.Product", "Product")
+                        .WithMany("DiscountProducts")
+                        .HasForeignKey("ProductId");
+
+                    b.Navigation("Discount");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("ProjectSEM3.Entities.Favoury", b =>
                 {
                     b.HasOne("ProjectSEM3.Entities.ProductColor", "ProductColor")
@@ -605,6 +717,15 @@ namespace ProjectSEM3.Migrations
                     b.Navigation("ProductColor");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.News", b =>
+                {
+                    b.HasOne("ProjectSEM3.Entities.Admin", "Admin")
+                        .WithMany("News")
+                        .HasForeignKey("AdminId");
+
+                    b.Navigation("Admin");
                 });
 
             modelBuilder.Entity("ProjectSEM3.Entities.Order", b =>
@@ -739,9 +860,19 @@ namespace ProjectSEM3.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ProjectSEM3.Entities.Admin", b =>
+                {
+                    b.Navigation("News");
+                });
+
             modelBuilder.Entity("ProjectSEM3.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.Discount", b =>
+                {
+                    b.Navigation("DiscountProducts");
                 });
 
             modelBuilder.Entity("ProjectSEM3.Entities.Order", b =>
@@ -754,6 +885,8 @@ namespace ProjectSEM3.Migrations
             modelBuilder.Entity("ProjectSEM3.Entities.Product", b =>
                 {
                     b.Navigation("Carts");
+
+                    b.Navigation("DiscountProducts");
 
                     b.Navigation("Favouries");
 

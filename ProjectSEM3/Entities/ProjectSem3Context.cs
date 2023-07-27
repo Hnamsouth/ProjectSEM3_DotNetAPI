@@ -45,7 +45,6 @@ public partial class ProjectSem3Context : DbContext
 
     public virtual DbSet<UserInfo> UserInfos { get; set; }
 
-    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Admin>(entity =>

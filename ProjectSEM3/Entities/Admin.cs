@@ -11,5 +11,7 @@ public partial class Admin
 
     public int? UserId { get; set; }
 
+    public virtual ICollection<News> News { get; set; } = new List<News>();
+
     public virtual User? User { get; set; }
 }

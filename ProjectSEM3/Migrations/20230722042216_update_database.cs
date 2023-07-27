@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectSEM3.Migrations
 {
     /// <inheritdoc />
-    public partial class create_database : Migration
+    public partial class update_database : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,6 +22,22 @@ namespace ProjectSEM3.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Categori__3214EC07DF9A41C9", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Discount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Coupon = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DiscountPercent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Thumbnail = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Discount", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -158,6 +174,32 @@ namespace ProjectSEM3.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DiscountProduct",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: true),
+                    DiscountId = table.Column<int>(type: "int", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiscountProduct", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DiscountProduct_Discount_DiscountId",
+                        column: x => x.DiscountId,
+                        principalTable: "Discount",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DiscountProduct_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductColor",
                 columns: table => new
                 {
@@ -201,6 +243,30 @@ namespace ProjectSEM3.Migrations
                         name: "FK__ProductRe__user___6E01572D",
                         column: x => x.user_id,
                         principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "News",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShortDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Thumbnail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AdminId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_News", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_News_Admins_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Admins",
                         principalColumn: "Id");
                 });
 
@@ -400,6 +466,16 @@ namespace ProjectSEM3.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_DiscountProduct_DiscountId",
+                table: "DiscountProduct",
+                column: "DiscountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DiscountProduct_ProductId",
+                table: "DiscountProduct",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Favouries_product_id",
                 table: "Favouries",
                 column: "product_id");
@@ -413,6 +489,11 @@ namespace ProjectSEM3.Migrations
                 name: "IX_Favouries_user_id",
                 table: "Favouries",
                 column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_News_AdminId",
+                table: "News",
+                column: "AdminId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetail_order_id",
@@ -512,13 +593,16 @@ namespace ProjectSEM3.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Admins");
-
-            migrationBuilder.DropTable(
                 name: "Carts");
 
             migrationBuilder.DropTable(
+                name: "DiscountProduct");
+
+            migrationBuilder.DropTable(
                 name: "Favouries");
+
+            migrationBuilder.DropTable(
+                name: "News");
 
             migrationBuilder.DropTable(
                 name: "OrderDetail");
@@ -534,6 +618,12 @@ namespace ProjectSEM3.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserInfo");
+
+            migrationBuilder.DropTable(
+                name: "Discount");
+
+            migrationBuilder.DropTable(
+                name: "Admins");
 
             migrationBuilder.DropTable(
                 name: "ProductSize");
