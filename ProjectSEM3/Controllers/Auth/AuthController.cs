@@ -24,7 +24,7 @@ namespace ProjectSEM3.Controllers.Auth
             _context = context;
             _config = config;
         }
-
+        // dadafas
         [HttpPost, Route("register")]
         [AllowAnonymous]
         async public Task<IActionResult> Register(UserRegister data)
