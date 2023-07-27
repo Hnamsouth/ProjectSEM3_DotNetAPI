@@ -4,15 +4,25 @@ namespace ProjectSEM3.DTOs
 {
 	public class ProductDto
 	{
-		public int? Id { get; set; }
+        public int Id { get; set; }
 
-		public string Name { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
-		public decimal Price { get; set; }
+        public decimal Price { get; set; }
 
-		public string? Description { get; set; }
+        public string? Description { get; set; }
 
-        public int? CategoryId { get; set; }
+        public int? CategoryId { get; set; } // shose , clothing , accessories..
+
+        public int? KindofsportId { get; set; } // FootBall, Running , Training...
+
+        public int? CategoryDetailId { get; set; } // shose: running, tenis , original.. or clothing: t-shirts, hoodies, jackets...
+
+        public byte Gender { get; set; } //  male, female , all
+
+        public DateTime OpenSale { get; set; } 
+
+        public byte Status { get; set; } // open , close , opening soon 
 
         public virtual ICollection<Cart>? Carts { get; set; } = new List<Cart>();
 

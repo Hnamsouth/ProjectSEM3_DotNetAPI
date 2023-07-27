@@ -11,6 +11,11 @@
   "profiles": {
     "http": {
       "commandName": "Project",
+<<<<<<< HEAD
+=======
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+>>>>>>> 8094aa941a17b6d35d9492abefe691040f0edd52
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5075",
       "environmentVariables": {
@@ -19,6 +24,11 @@
     },
     "https": {
       "commandName": "Project",
+<<<<<<< HEAD
+=======
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+>>>>>>> 8094aa941a17b6d35d9492abefe691040f0edd52
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7133;http://localhost:5075",
       "environmentVariables": {

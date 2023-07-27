@@ -21,8 +21,7 @@ namespace ProjectSEM3.Controllers
         }
 
         // GET: api/<CategoryController>
-        [HttpGet,
-            Route("get")]
+        [HttpGet]
         async public Task<IActionResult> Get(int? id)
         {
             if (id == null)
@@ -37,7 +36,7 @@ namespace ProjectSEM3.Controllers
         }
 
         // POST api/<CategoryController>
-        [HttpPost]
+        [HttpPost,Route("create")]
         async public Task<IActionResult> Create(CategoryDto data)
         {
             if (ModelState.IsValid)
@@ -50,7 +49,7 @@ namespace ProjectSEM3.Controllers
         }
 
         // PUT api/<CategoryController>/5
-        [HttpPut]
+        [HttpPut, Route("update")]
         async public Task<IActionResult> Update(Category data)
         {
             if (ModelState.IsValid)
@@ -63,7 +62,7 @@ namespace ProjectSEM3.Controllers
         }
 
         // DELETE api/<CategoryController>/5
-        [HttpDelete]
+        [HttpDelete, Route("delete")]
         async public Task<IActionResult> Delete(int id)
         {
             var c = _context.Categories.Find(id);
@@ -71,6 +70,7 @@ namespace ProjectSEM3.Controllers
             {
                 _context.Categories.Remove(c);
                await  _context.SaveChangesAsync();
+                return NoContent();
             }
             return NotFound();
         }
@@ -78,9 +78,14 @@ namespace ProjectSEM3.Controllers
         [HttpGet,Route("upload-demo")]
         async public Task<IActionResult> Upload()
         {
-            var up = new UploadImg();
-            var rs = await up.Upload(null,null,null);
+            var rs = await UploadImg.Upload(null,null,null);
             Console.WriteLine(rs);
+            return Ok(rs);
+        }
+        [HttpGet, Route("upload-getImg")]
+        async public Task<IActionResult> GetImgFolder()
+        {
+            var rs = await UploadImg.getImg(null);
             return Ok(rs);
         }
     }
