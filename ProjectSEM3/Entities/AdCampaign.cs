@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace ProjectSEM3.Entities;
 
 public partial class AdCampaign
 {
-    [Key]
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
