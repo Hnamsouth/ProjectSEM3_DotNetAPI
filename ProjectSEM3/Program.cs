@@ -38,7 +38,7 @@ builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
     //thêm comment sau mỗi 1 dòng connectionstring
     //opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Hienlocal"))
     //opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Local-south"))
-    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Server"))
+    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("LLocal2"))
 );
 
 // add authentication
