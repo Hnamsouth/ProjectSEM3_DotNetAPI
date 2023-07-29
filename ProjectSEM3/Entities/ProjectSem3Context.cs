@@ -72,7 +72,7 @@ public partial class ProjectSem3Context : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=SOUTH\\SQLEXPRESS;Initial Catalog=Project_SEM3;Integrated Security=True;TrustServerCertificate=True");
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AdCampaign>(entity =>
@@ -121,14 +121,9 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Carts__3214EC07A226B5B5");
 
             entity.Property(e => e.BuyQty).HasColumnName("buy_qty");
-            entity.Property(e => e.ProductColorId).HasColumnName("productColor_id");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductSizeId).HasColumnName("productSize_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
-
-            entity.HasOne(d => d.ProductColor).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.ProductColorId)
-                .HasConstraintName("FK__Carts__productCo__1BC821DD");
 
             entity.HasOne(d => d.Product).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.ProductId)
@@ -218,13 +213,10 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Favourie__3214EC0752A82DA1");
 
-            entity.Property(e => e.ProductColorId).HasColumnName("productColor_id");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.ProductColor).WithMany(p => p.Favouries)
-                .HasForeignKey(d => d.ProductColorId)
-                .HasConstraintName("FK__Favouries__produ__208CD6FA");
+
 
             entity.HasOne(d => d.Product).WithMany(p => p.Favouries)
                 .HasForeignKey(d => d.ProductId)
@@ -295,7 +287,6 @@ public partial class ProjectSem3Context : DbContext
             entity.ToTable("OrderDetail");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.ProductColorId).HasColumnName("productColor_id");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductSizeId).HasColumnName("productSize_id");
 
@@ -303,9 +294,6 @@ public partial class ProjectSem3Context : DbContext
                 .HasForeignKey(d => d.OrderId)
                 .HasConstraintName("FK__OrderDeta__order__245D67DE");
 
-            entity.HasOne(d => d.ProductColor).WithMany(p => p.OrderDetails)
-                .HasForeignKey(d => d.ProductColorId)
-                .HasConstraintName("FK__OrderDeta__produ__25518C17");
 
             entity.HasOne(d => d.Product).WithMany(p => p.OrderDetails)
                 .HasForeignKey(d => d.ProductId)
@@ -434,9 +422,6 @@ public partial class ProjectSem3Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.ProductId).HasColumnName("product_id");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.ProductColors)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductCo__produ__2B0A656D");
         });
 
         modelBuilder.Entity<ProductForChild>(entity =>
@@ -480,13 +465,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__ProductS__3214EC07D29ABF3C");
 
             entity.ToTable("ProductSize");
-
-            entity.Property(e => e.ProductColorId).HasColumnName("productColor_id");
-            entity.Property(e => e.SizeId).HasColumnName("size_id");
-
-            entity.HasOne(d => d.ProductColor).WithMany(p => p.ProductSizes)
-                .HasForeignKey(d => d.ProductColorId)
-                .HasConstraintName("FK__ProductSi__produ__2EDAF651");
 
             entity.HasOne(d => d.Size).WithMany(p => p.ProductSizes)
                 .HasForeignKey(d => d.SizeId)
@@ -588,6 +566,6 @@ public partial class ProjectSem3Context : DbContext
 
         OnModelCreatingPartial(modelBuilder);
     }
-
+    
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

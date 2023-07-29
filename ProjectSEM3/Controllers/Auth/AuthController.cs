@@ -7,6 +7,8 @@ using NuGet.Packaging;
 using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 
@@ -130,5 +132,6 @@ namespace ProjectSEM3.Controllers.Auth
             return Unauthorized();
 
         }
+    
     }
 }

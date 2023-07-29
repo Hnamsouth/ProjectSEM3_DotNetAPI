@@ -8,6 +8,8 @@ public partial class Product
     public int Id { get; set; }
     public string Name { get; set; } = null!;
     public decimal Price { get; set; }
+    public string? ColorName { get; set; }
+    public string Img { get; set; } = null!;
     public string? Description { get; set; }
     public int? CategoryId { get; set; }
     public int? KindofsportId { get; set; }
@@ -22,7 +24,6 @@ public partial class Product
     public virtual ICollection<Favoury> Favouries { get; set; } = new List<Favoury>();
     public virtual KindOfSport? Kindofsport { get; set; }
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
-    public virtual ICollection<ProductColor> ProductColors { get; set; } = new List<ProductColor>();
     public virtual ICollection<ProductForChild> ProductForChildren { get; set; } = new List<ProductForChild>();
     public virtual ICollection<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
 }
