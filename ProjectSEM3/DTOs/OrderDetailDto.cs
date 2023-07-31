@@ -21,7 +21,7 @@ namespace ProjectSEM3.DTOs
 
         public virtual Product? Product { get; set; }
 
-        public virtual ProductColor? ProductColor { get; set; }
+        //public virtual ProductColor? ProductColor { get; set; }
 
         public virtual ProductSize? ProductSize { get; set; }
     }
