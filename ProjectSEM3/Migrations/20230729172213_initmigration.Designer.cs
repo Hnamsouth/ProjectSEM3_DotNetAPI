@@ -13,7 +13,7 @@ namespace ProjectSEM3.Migrations
 {
     [DbContext(typeof(ProjectSem3Context))]
     [Migration("20230729172213_initmigration")]
-    partial class initmigration
+    partial class Initmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
