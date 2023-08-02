@@ -32,6 +32,7 @@ namespace ProjectSEM3.DTOs
 
         public virtual ICollection<OrderDetail>? OrderDetails { get; set; } = new List<OrderDetail>();
 
+        public virtual ICollection<ProductColor>? ProductColors { get; set; } = new List<ProductColor>();
 
         public virtual ICollection<ProductReview>? ProductReviews { get; set; } = new List<ProductReview>();
     }
