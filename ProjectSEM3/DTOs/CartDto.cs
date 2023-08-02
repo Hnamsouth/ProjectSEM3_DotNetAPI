@@ -6,7 +6,6 @@
 
         public int BuyQty { get; set; }
 
-        public int? ProductColorId { get; set; }
 
         public int? ProductId { get; set; }
 

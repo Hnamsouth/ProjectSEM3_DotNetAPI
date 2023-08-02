@@ -5,6 +5,7 @@ using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
+using PubnubApi;
 
 DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
@@ -35,10 +36,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
-    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Server"))
+    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Local-south"))
 );
 
 // add authentication
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -62,7 +64,14 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("Auth", policy => policy.RequireAuthenticatedUser());
 });
-
+/*
+PNConfiguration pnConfiguration = new PNConfiguration(new UserId(builder.Configuration["Pubnub:userId"]));
+pnConfiguration.PublishKey = builder.Configuration["Pubnub:pKey"];
+pnConfiguration.SubscribeKey = builder.Configuration["Pubnub:sKey"];
+pnConfiguration.Secure = false;
+Pubnub pubnub = new Pubnub(pnConfiguration);
+builder.Services.AddSingleton<Pubnub>(pubnub);
+*/
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -9,7 +9,6 @@ namespace ProjectSEM3.DTOs
 
         public int Qty { get; set; }
 
-        public int? ProductColorId { get; set; }
 
         public int? ProductId { get; set; }
 
@@ -21,7 +20,6 @@ namespace ProjectSEM3.DTOs
 
         public virtual Product? Product { get; set; }
 
-        public virtual ProductColor? ProductColor { get; set; }
 
         public virtual ProductSize? ProductSize { get; set; }
     }

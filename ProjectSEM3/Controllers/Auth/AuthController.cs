@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using NuGet.Packaging;
 using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
@@ -10,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace ProjectSEM3.Controllers.Auth
@@ -132,6 +134,47 @@ namespace ProjectSEM3.Controllers.Auth
             return Unauthorized();
 
         }
-    
+        
+        [HttpPost,Route("get-token")]
+        [AllowAnonymous]
+        async public Task<IActionResult> GetPayload(string token)
+        {
+            var rs=GetJwtPayload(token);
+            
+            return Ok(new UserData { Id=1,Email=rs,Token="" });
+        }
+        
+        protected string GetJwtPayload(string jwtToken)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("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")),
+                ValidIssuer = "https://accounts.google.com",
+                ValidAudience = "122068012715-mr0gurvo72c3qveo7ntrcq3h3fq1h6sa.apps.googleusercontent.com",
+                ValidateLifetime = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+            };
+
+            try
+            {
+                // Xác minh tính toàn vẹn của JWT
+                var claimsPrincipal = tokenHandler.ValidateToken(jwtToken, validationParameters, out var validatedToken);
+                var jwtPayload = "";
+                foreach (var claim in claimsPrincipal.Claims)
+                {
+                    jwtPayload += claim.Type.ToString() + claim.Value.ToString();
+                }
+                return jwtPayload;
+            }
+            catch (Exception ex)
+            {
+                // Xác minh thất bại
+                return null;
+            }
+        }
+
     }
 }
