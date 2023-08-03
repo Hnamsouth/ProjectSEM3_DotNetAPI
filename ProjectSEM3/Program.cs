@@ -35,7 +35,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
-    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Server"))
+    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Hienlocal"))
 );
 
 // add authentication
