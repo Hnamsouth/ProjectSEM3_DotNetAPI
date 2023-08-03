@@ -11,7 +11,7 @@ using ProjectSEM3.Services;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/adCampaign")]
+    [Route("api/ad-campaign")]
     [ApiController]
     public class AdCampaignController : ControllerBase
     {

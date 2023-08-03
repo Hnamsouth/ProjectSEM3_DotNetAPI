@@ -4,14 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
 using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/productForChild")]
+    [Route("api/product-for-child")]
     [ApiController]
     public class ProductForChildController : ControllerBase
     {

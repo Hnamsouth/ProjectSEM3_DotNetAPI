@@ -10,7 +10,7 @@ using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/discountProduct")]
+    [Route("api/discount-roduct")]
     [ApiController]
     public class DiscountProductController : ControllerBase
     {

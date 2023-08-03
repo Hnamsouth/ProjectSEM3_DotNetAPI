@@ -7,17 +7,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
 using ProjectSEM3.Entities;
-using ProjectSEM3.Services;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/partners-info")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class PartnersInfoController : ControllerBase
+    public class CategoryDetailController : ControllerBase
     {
         private readonly ProjectSem3Context _context;
 
-        public PartnersInfoController(ProjectSem3Context context)
+        public CategoryDetailController(ProjectSem3Context context)
         {
             _context = context;
         }
@@ -28,22 +27,22 @@ namespace ProjectSEM3.Controllers
         {
             if (id == null)
             {
-                var pnis = await _context.PartnersInfos.ToListAsync();
-                return Ok(pnis);
+                var cds = await _context.CategoryDetails.ToListAsync();
+                return Ok(cds);
             }
-            var pni = await _context.PartnersInfos.FindAsync(id);
+            var cd = await _context.CategoryDetails.FindAsync(id);
 
-            if (pni == null) { return NotFound(); }
-            return Ok(pni);
+            if (cd == null) { return NotFound(); }
+            return Ok(cd);
         }
 
         // POST api/<CategoryController>
         [HttpPost, Route("create")]
-        async public Task<IActionResult> Create(PartnersInfoDto data)
+        async public Task<IActionResult> Create(CategoryDetailDto data)
         {
             if (ModelState.IsValid)
             {
-                _context.PartnersInfos.Add(new PartnersInfo { Phone = data.Phone, CompanyName = data.CompanyName, Address = data.Address, Img = data.Img, PartnersId = data.PartnersId });
+                _context.CategoryDetails.Add(new CategoryDetail { Name = data.Name, CategoryId = data.CategoryId });
                 await _context.SaveChangesAsync();
                 return Created($"/get?id={data.Id}", data);
             }
@@ -52,11 +51,11 @@ namespace ProjectSEM3.Controllers
 
         // PUT api/<CategoryController>/5
         [HttpPut, Route("update")]
-        async public Task<IActionResult> Update(PartnersInfo data)
+        async public Task<IActionResult> Update(CategoryDetail data)
         {
             if (ModelState.IsValid)
             {
-                _context.PartnersInfos.Update(data);
+                _context.CategoryDetails.Update(data);
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
@@ -67,28 +66,14 @@ namespace ProjectSEM3.Controllers
         [HttpDelete, Route("delete")]
         async public Task<IActionResult> Delete(int id)
         {
-            var a = _context.PartnersInfos.Find(id);
+            var a = _context.CategoryDetails.Find(id);
             if (a != null)
             {
-                _context.PartnersInfos.Remove(a);
+                _context.CategoryDetails.Remove(a);
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
             return NotFound();
-        }
-
-        [HttpGet, Route("upload-demo")]
-        async public Task<IActionResult> Upload()
-        {
-            var rs = await UploadImg.Upload(null, null, null);
-            Console.WriteLine(rs);
-            return Ok(rs);
-        }
-        [HttpGet, Route("upload-getImg")]
-        async public Task<IActionResult> GetImgFolder()
-        {
-            var rs = await UploadImg.getImg(null);
-            return Ok(rs);
         }
     }
 }
