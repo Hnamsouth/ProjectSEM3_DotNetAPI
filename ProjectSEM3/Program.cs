@@ -5,6 +5,9 @@ using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
+using ProjectSEM3.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ProjectSEM3.Services;
 
 DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
@@ -35,7 +38,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
-    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Server"))
+    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Local-south"))
 );
 
 // add authentication
@@ -62,6 +65,11 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("Auth", policy => policy.RequireAuthenticatedUser());
 });
+
+// add email config
+builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSetting"));
+// add email service
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 

@@ -504,6 +504,8 @@ public partial class ProjectSem3Context : DbContext
 
             entity.HasIndex(e => e.SizeId, "IX_ProductSize_SizeId");
 
+            entity.HasIndex(e => e.ProductId, "IX_ProductSize_product_id");
+
             entity.Property(e => e.ProductId).HasColumnName("product_id");
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductSizes)
@@ -533,17 +535,13 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Users__3214EC07AE7F2844");
 
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E41CC69CB7").IsUnique();
-
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534FAE63181").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534B7ED3B19").IsUnique();
 
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.Password).HasColumnType("text");
-            entity.Property(e => e.Username)
-                .HasMaxLength(100)
-                .IsUnicode(false);
+            entity.Property(e => e.Token).HasColumnType("text");
         });
 
         modelBuilder.Entity<UserCard>(entity =>

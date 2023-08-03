@@ -7,11 +7,13 @@ public partial class User
 {
     public int Id { get; set; }
 
-    public string Username { get; set; } = null!;
-
     public string Email { get; set; } = null!;
 
-    public string Password { get; set; } = null!;
+    public string? Password { get; set; }
+
+    public bool Activate { get; set; }
+
+    public string? Token { get; set; }
 
     public virtual ICollection<Admin> Admins { get; set; } = new List<Admin>();
 
