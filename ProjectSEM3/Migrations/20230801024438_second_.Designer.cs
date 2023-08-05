@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectSEM3.Entities;
 
@@ -11,9 +12,11 @@ using ProjectSEM3.Entities;
 namespace ProjectSEM3.Migrations
 {
     [DbContext(typeof(ProjectSem3Context))]
-    partial class ProjectSem3ContextModelSnapshot : ModelSnapshot
+    [Migration("20230801024438_second_")]
+    partial class second_
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -780,8 +783,17 @@ namespace ProjectSEM3.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
                     b.HasKey("Id")
                         .HasName("PK__Users__3214EC07AE7F2844");
+
+                    b.HasIndex(new[] { "Username" }, "UQ__Users__536C85E41CC69CB7")
+                        .IsUnique();
 
                     b.HasIndex(new[] { "Email" }, "UQ__Users__A9D10534FAE63181")
                         .IsUnique();
