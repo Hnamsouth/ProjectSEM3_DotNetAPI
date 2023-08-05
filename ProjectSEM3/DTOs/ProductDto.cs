@@ -4,8 +4,8 @@ namespace ProjectSEM3.DTOs
 {
 	public class ProductDto
 	{
-
-		public string Name { get; set; } = null!;
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
 
 		public decimal Price { get; set; }
 
