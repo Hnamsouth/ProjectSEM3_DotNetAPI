@@ -13,6 +13,7 @@ namespace ProjectSEM3.Controllers
 {
     [Route("api/product-review")]
     [ApiController]
+    public class ProductReviewController:ControllerBase
     {
         private readonly ProjectSem3Context _context;
 

@@ -14,6 +14,7 @@ namespace ProjectSEM3.Controllers
 {
     [Route("api/product-size")]
     [ApiController]
+    public class ProductSizeController : ControllerBase
     {
 
         private readonly ProjectSem3Context _context;
