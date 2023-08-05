@@ -1,17 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NuGet.Packaging;
 using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Services;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Net.Mail;
 using System.Security.Claims;
-using System.Security.Policy;
 using System.Text;
 
 namespace ProjectSEM3.Controllers.Auth
@@ -37,18 +32,40 @@ namespace ProjectSEM3.Controllers.Auth
         {
             if (ModelState.IsValid)
             {
-                //var hashPW = BCrypt.Net.BCrypt.HashPassword(data.Password);
+                // hash pw and token
                 var token = BCrypt.Net.BCrypt.HashString(data.Email, 10);
                 var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password);
-                
-                var user = new User { Email = data.Email,Token = data.Email ,Password=passHash};
-                    await _context.Users.AddAsync(user);
-                var userInfo = new UserInfo { Gender = data.Gender, Birthday = data.Birthday ,Name=data.FirstName+data.LastName};
-                    await _context.UserInfos.AddAsync(userInfo);
-
+                // create new user and user info
+                var user = new User { Email = data.Email, Token = data.Email, Password = passHash };
+                await _context.Users.AddAsync(user);
+                var userInfo = new UserInfo { Gender = data.Gender, Birthday = data.Birthday, Name = data.FirstName + data.LastName };
+                await _context.UserInfos.AddAsync(userInfo);
+                // save user
                 await _context.SaveChangesAsync();
-                _emailService.SendEmail(userInfo.Name, data.Email,token);
-                
+                // send verify email
+                _emailService.SendEmail(userInfo.Name, data.Email, token);
+
+                return Ok(true);
+            }
+            return BadRequest(false);
+        }
+        [HttpPost, Route("register-gg")]
+        [AllowAnonymous]
+        async public Task<IActionResult> RegisterGG(GoogleToken data)
+        {
+            if (ModelState.IsValid)
+            {
+                // hash pw and token
+                var token = BCrypt.Net.BCrypt.HashString(data.email, 10);
+                var user = new User { Email = data.email, Token = data.email };
+                await _context.Users.AddAsync(user);
+                var userInfo = new UserInfo {  Name = data.family_name + data.given_name};
+                await _context.UserInfos.AddAsync(userInfo);
+                // save user
+                await _context.SaveChangesAsync();
+                // send verify email
+                _emailService.SendEmail(userInfo.Name, data.email, token);
+
                 return Ok(true);
             }
             return BadRequest(false);
@@ -102,7 +119,7 @@ namespace ProjectSEM3.Controllers.Auth
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddHours(1),
+                Expires = DateTime.Now.AddMinutes(1),
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -113,7 +130,7 @@ namespace ProjectSEM3.Controllers.Auth
         }
 
         [HttpPost, Route("login")]
-       [AllowAnonymous]
+        [AllowAnonymous]
         async public Task<IActionResult> Login(UserLogin data)
         {
             if (ModelState.IsValid)
@@ -123,25 +140,25 @@ namespace ProjectSEM3.Controllers.Auth
                 if (u == null) return NotFound();
                 var checkPW = BCrypt.Net.BCrypt.Verify(data.Password, u.Password);
                 if (!checkPW) return Unauthorized();
-                return Ok(new UserData {Id=u.Id, Email = u.Email, Token = GJWT(u) });
+                return Ok(new UserData { Id = u.Id, Email = u.Email, Token = GJWT(u) });
             }
             return BadRequest();
-            
+
         }
 
-        [HttpPost,Route("login-gg"), AllowAnonymous]
+        [HttpPost, Route("login-gg"), AllowAnonymous]
         async public Task<IActionResult> LoginWithGG(GoogleToken data)
         {
             if (ModelState.IsValid)
             {
-                var user =await _context.Users.Where(u => u.Email.Equals(data.email)).FirstOrDefaultAsync();
+                var user = await _context.Users.Where(u => u.Email.Equals(data.email)).FirstOrDefaultAsync();
                 if (user == null) return NotFound();
 
-                return Ok(new UserData {Id=user.Id, Email = data.email, Token = GenerateJWT(user) });
+                return Ok(new UserData { Id = user.Id, Email = data.email, Token = GJWT(user) });
             }
             return BadRequest();
         }
-        [HttpGet,Route("profile")]
+        [HttpGet, Route("profile")]
         async public Task<IActionResult> GetProfile()
         {
             // xac thuc danh tinh user
@@ -159,27 +176,40 @@ namespace ProjectSEM3.Controllers.Auth
             }
             return Unauthorized();
         }
-        [HttpPost,Route("check-register"),AllowAnonymous]
+        [HttpPost, Route("check-register"), AllowAnonymous]
         async public Task<IActionResult> IsEmailExist(string email)
         {
-            var u =await _context.Users.Where(e=>e.Email.Equals(email)).FirstOrDefaultAsync();
+            var u = await _context.Users.Where(e => e.Email.Equals(email)).FirstOrDefaultAsync();
             if (u == null) return Ok(false);
             return Ok(true);
         }
 
         [HttpPost, Route("verify-email"), AllowAnonymous]
-        async public Task<IActionResult> VerifyEmail(string email,string token)
+        async public Task<IActionResult> VerifyEmail(string email, string token)
         {
             var u = await _context.Users.Where(e => e.Email.Equals(email)).FirstOrDefaultAsync();
             if (u == null) return NotFound(false);
 
             var check = BCrypt.Net.BCrypt.Verify(u.Token, token);
-            if(!check) return BadRequest(false);
+            if (!check) return BadRequest(false);
 
             u.Activate = true;
             _context.Users.Update(u);
             await _context.SaveChangesAsync();
             return Ok(true);
+        }
+
+        [HttpPost, Route("check-token")]
+        async public Task<IActionResult> CheckToken()
+        {
+
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity == null) return Unauthorized(new Check { CheckToken=false});
+            return Ok(new Check { CheckToken = true });
+        }
+        class Check
+        {
+            public bool CheckToken { get; set; }
         }
     }
 }
