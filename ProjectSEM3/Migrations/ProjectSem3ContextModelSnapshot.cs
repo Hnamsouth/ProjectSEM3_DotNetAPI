@@ -61,9 +61,9 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__AdCampai__3214EC07F7E8AE31");
 
-                    b.HasIndex("CollectionId");
+                    b.HasIndex(new[] { "CollectionId" }, "IX_AdCampaign_collection_id");
 
-                    b.HasIndex("PartnersId");
+                    b.HasIndex(new[] { "PartnersId" }, "IX_AdCampaign_partners_id");
 
                     b.ToTable("AdCampaign", (string)null);
                 });
@@ -89,7 +89,7 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__Admins__3214EC07E6E0EE75");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_Admins_user_id");
 
                     b.HasIndex(new[] { "Role" }, "UQ__Admins__DA15413E248224BD")
                         .IsUnique();
@@ -109,10 +109,6 @@ namespace ProjectSEM3.Migrations
                         .HasColumnType("int")
                         .HasColumnName("buy_qty");
 
-                    b.Property<int?>("ProductColorId")
-                        .HasColumnType("int")
-                        .HasColumnName("productColor_id");
-
                     b.Property<int?>("ProductId")
                         .HasColumnType("int")
                         .HasColumnName("product_id");
@@ -128,13 +124,11 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__Carts__3214EC07A226B5B5");
 
-                    b.HasIndex("ProductColorId");
+                    b.HasIndex(new[] { "ProductSizeId" }, "IX_Carts_productSize_id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex(new[] { "ProductId" }, "IX_Carts_product_id");
 
-                    b.HasIndex("ProductSizeId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_Carts_user_id");
 
                     b.ToTable("Carts");
                 });
@@ -161,7 +155,7 @@ namespace ProjectSEM3.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("ProjectSEM3.Entities.Favoury", b =>
+            modelBuilder.Entity("ProjectSEM3.Entities.CategoryDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -169,9 +163,123 @@ namespace ProjectSEM3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ProductColorId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int")
-                        .HasColumnName("productColor_id");
+                        .HasColumnName("category_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id")
+                        .HasName("PK__Category__3214EC071CD2494F");
+
+                    b.HasIndex(new[] { "CategoryId" }, "IX_CategoryDetail_category_id");
+
+                    b.HasIndex(new[] { "Name" }, "UQ__Category__737584F67976B658")
+                        .IsUnique();
+
+                    b.ToTable("CategoryDetail", (string)null);
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.Collection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id")
+                        .HasName("PK__Collecti__3214EC070B2DCC12");
+
+                    b.ToTable("Collections");
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.Discount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Coupon")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<decimal>("DiscountPercent")
+                        .HasColumnType("decimal(3, 1)");
+
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id")
+                        .HasName("PK__Discount__3214EC074E2CC928");
+
+                    b.ToTable("Discount", (string)null);
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.DiscountProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("DiscountId")
+                        .HasColumnType("int")
+                        .HasColumnName("Discount_id");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int")
+                        .HasColumnName("Product_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.HasKey("Id")
+                        .HasName("PK__Discount__3214EC07763F58C0");
+
+                    b.HasIndex(new[] { "DiscountId" }, "IX_DiscountProduct_Discount_id");
+
+                    b.HasIndex(new[] { "ProductId" }, "IX_DiscountProduct_Product_id");
+
+                    b.ToTable("DiscountProduct", (string)null);
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.Favoury", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int")
@@ -184,13 +292,34 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__Favourie__3214EC0752A82DA1");
 
-                    b.HasIndex("ProductColorId");
+                    b.HasIndex(new[] { "ProductId" }, "IX_Favouries_product_id");
 
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_Favouries_user_id");
 
                     b.ToTable("Favouries");
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.KindOfSport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id")
+                        .HasName("PK__KindOfSp__3214EC077F32249A");
+
+                    b.HasIndex(new[] { "Name" }, "UQ__KindOfSp__737584F6CDD7C52D")
+                        .IsUnique();
+
+                    b.ToTable("KindOfSport", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSEM3.Entities.News", b =>
@@ -202,33 +331,42 @@ namespace ProjectSEM3.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AdminId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Admin_id");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasColumnName("Created_at")
+                        .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("ShortDescription")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Thumbnail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime")
+                        .HasColumnName("Update_at");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PK__News__3214EC077F5C2BFE");
 
-                    b.HasIndex("AdminId");
+                    b.HasIndex(new[] { "AdminId" }, "IX_News_Admin_id");
 
                     b.ToTable("News");
                 });
@@ -262,7 +400,7 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__Orders__3214EC074A5FA77D");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_Orders_user_id");
 
                     b.ToTable("Orders");
                 });
@@ -279,10 +417,6 @@ namespace ProjectSEM3.Migrations
                         .HasColumnType("int")
                         .HasColumnName("order_id");
 
-                    b.Property<int?>("ProductColorId")
-                        .HasColumnType("int")
-                        .HasColumnName("productColor_id");
-
                     b.Property<int?>("ProductId")
                         .HasColumnType("int")
                         .HasColumnName("product_id");
@@ -297,13 +431,11 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__OrderDet__3214EC070E1688EB");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex(new[] { "OrderId" }, "IX_OrderDetail_order_id");
 
-                    b.HasIndex("ProductColorId");
+                    b.HasIndex(new[] { "ProductSizeId" }, "IX_OrderDetail_productSize_id");
 
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductSizeId");
+                    b.HasIndex(new[] { "ProductId" }, "IX_OrderDetail_product_id");
 
                     b.ToTable("OrderDetail", (string)null);
                 });
@@ -372,7 +504,7 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__Partners__3214EC07AA9DB02A");
 
-                    b.HasIndex("PartnersId");
+                    b.HasIndex(new[] { "PartnersId" }, "IX_PartnersInfo_partners_id");
 
                     b.ToTable("PartnersInfo", (string)null);
                 });
@@ -421,9 +553,9 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__Payment__3214EC07D75A8B65");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex(new[] { "OrderId" }, "IX_Payment_order_id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_Payment_user_id");
 
                     b.ToTable("Payment", (string)null);
                 });
@@ -444,11 +576,22 @@ namespace ProjectSEM3.Migrations
                         .HasColumnType("int")
                         .HasColumnName("category_id");
 
+                    b.Property<string>("ColorName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
                     b.Property<byte>("Gender")
-                        .HasColumnType("tinyint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint")
+                        .HasDefaultValueSql("(CONVERT([tinyint],(0)))");
+
+                    b.Property<string>("Img")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValueSql("(N'')");
 
                     b.Property<int?>("KindofsportId")
                         .HasColumnType("int")
@@ -468,16 +611,18 @@ namespace ProjectSEM3.Migrations
                         .HasColumnType("decimal(12, 4)");
 
                     b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint")
+                        .HasDefaultValueSql("(CONVERT([tinyint],(0)))");
 
                     b.HasKey("Id")
                         .HasName("PK__Products__3214EC0726D18407");
 
-                    b.HasIndex("CategoryDetailId");
+                    b.HasIndex(new[] { "CategoryDetailId" }, "IX_Products_category_detail_id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex(new[] { "CategoryId" }, "IX_Products_category_id");
 
-                    b.HasIndex("KindofsportId");
+                    b.HasIndex(new[] { "KindofsportId" }, "IX_Products_kindofsport_id");
 
                     b.ToTable("Products");
                 });
@@ -492,42 +637,11 @@ namespace ProjectSEM3.Migrations
                         .HasColumnType("int")
                         .HasColumnName("product_id");
 
-                    b.HasIndex("AdcampaignId");
+                    b.HasIndex(new[] { "AdcampaignId" }, "IX_ProductAdCampaign_adcampaign_id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex(new[] { "ProductId" }, "IX_ProductAdCampaign_product_id");
 
                     b.ToTable("ProductAdCampaign", (string)null);
-                });
-
-            modelBuilder.Entity("ProjectSEM3.Entities.ProductColor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ColorName")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("Img")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int")
-                        .HasColumnName("product_id");
-
-                    b.HasKey("Id")
-                        .HasName("PK__ProductC__3214EC071B1CD27C");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductColor", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSEM3.Entities.ProductForChild", b =>
@@ -551,7 +665,7 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__ProductF__3214EC071774F8E7");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex(new[] { "ProductId" }, "IX_ProductForChild_product_id");
 
                     b.ToTable("ProductForChild", (string)null);
                 });
@@ -587,9 +701,9 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__ProductR__3214EC075CE6C025");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex(new[] { "ProductId" }, "IX_ProductReview_product_id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_ProductReview_user_id");
 
                     b.ToTable("ProductReview", (string)null);
                 });
@@ -602,23 +716,22 @@ namespace ProjectSEM3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ProductColorId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int")
-                        .HasColumnName("productColor_id");
+                        .HasColumnName("product_id");
 
                     b.Property<int>("Qty")
                         .HasColumnType("int");
 
                     b.Property<int?>("SizeId")
-                        .HasColumnType("int")
-                        .HasColumnName("size_id");
+                        .HasColumnType("int");
 
                     b.HasKey("Id")
                         .HasName("PK__ProductS__3214EC07D29ABF3C");
 
-                    b.HasIndex("ProductColorId");
+                    b.HasIndex("ProductId");
 
-                    b.HasIndex("SizeId");
+                    b.HasIndex(new[] { "SizeId" }, "IX_ProductSize_SizeId");
 
                     b.ToTable("ProductSize", (string)null);
                 });
@@ -636,6 +749,9 @@ namespace ProjectSEM3.Migrations
                         .HasMaxLength(10)
                         .IsUnicode(false)
                         .HasColumnType("varchar(10)");
+
+                    b.Property<byte>("SizeType")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id")
                         .HasName("PK__Size__3214EC07E98EF804");
@@ -664,17 +780,8 @@ namespace ProjectSEM3.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
-
                     b.HasKey("Id")
                         .HasName("PK__Users__3214EC07AE7F2844");
-
-                    b.HasIndex(new[] { "Username" }, "UQ__Users__536C85E41CC69CB7")
-                        .IsUnique();
 
                     b.HasIndex(new[] { "Email" }, "UQ__Users__A9D10534FAE63181")
                         .IsUnique();
@@ -710,7 +817,7 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("CardNumber")
                         .HasName("PK__UserCard__A4E9FFE8CFE115A2");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_UserCard_user_id");
 
                     b.ToTable("UserCard", (string)null);
                 });
@@ -758,7 +865,7 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__UserInfo__3214EC07F4ADAEF8");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_UserInfo_user_id");
 
                     b.ToTable("UserInfo", (string)null);
                 });
@@ -835,11 +942,6 @@ namespace ProjectSEM3.Migrations
 
             modelBuilder.Entity("ProjectSEM3.Entities.Cart", b =>
                 {
-                    b.HasOne("ProjectSEM3.Entities.ProductColor", "ProductColor")
-                        .WithMany("Carts")
-                        .HasForeignKey("ProductColorId")
-                        .HasConstraintName("FK__Carts__productCo__1BC821DD");
-
                     b.HasOne("ProjectSEM3.Entities.Product", "Product")
                         .WithMany("Carts")
                         .HasForeignKey("ProductId")
@@ -857,22 +959,32 @@ namespace ProjectSEM3.Migrations
 
                     b.Navigation("Product");
 
-                    b.Navigation("ProductColor");
-
                     b.Navigation("ProductSize");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.CategoryDetail", b =>
+                {
+                    b.HasOne("ProjectSEM3.Entities.Category", "Category")
+                        .WithMany("CategoryDetails")
+                        .HasForeignKey("CategoryId")
+                        .HasConstraintName("FK__CategoryD__categ__40058253");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("ProjectSEM3.Entities.DiscountProduct", b =>
                 {
                     b.HasOne("ProjectSEM3.Entities.Discount", "Discount")
                         .WithMany("DiscountProducts")
-                        .HasForeignKey("DiscountId");
+                        .HasForeignKey("DiscountId")
+                        .HasConstraintName("FK__DiscountP__Disco__1EA48E88");
 
                     b.HasOne("ProjectSEM3.Entities.Product", "Product")
                         .WithMany("DiscountProducts")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .HasConstraintName("FK__DiscountP__Produ__1F98B2C1");
 
                     b.Navigation("Discount");
 
@@ -881,11 +993,6 @@ namespace ProjectSEM3.Migrations
 
             modelBuilder.Entity("ProjectSEM3.Entities.Favoury", b =>
                 {
-                    b.HasOne("ProjectSEM3.Entities.ProductColor", "ProductColor")
-                        .WithMany("Favouries")
-                        .HasForeignKey("ProductColorId")
-                        .HasConstraintName("FK__Favouries__produ__208CD6FA");
-
                     b.HasOne("ProjectSEM3.Entities.Product", "Product")
                         .WithMany("Favouries")
                         .HasForeignKey("ProductId")
@@ -898,8 +1005,6 @@ namespace ProjectSEM3.Migrations
 
                     b.Navigation("Product");
 
-                    b.Navigation("ProductColor");
-
                     b.Navigation("User");
                 });
 
@@ -907,7 +1012,8 @@ namespace ProjectSEM3.Migrations
                 {
                     b.HasOne("ProjectSEM3.Entities.Admin", "Admin")
                         .WithMany("News")
-                        .HasForeignKey("AdminId");
+                        .HasForeignKey("AdminId")
+                        .HasConstraintName("FK__News__Admin_id__236943A5");
 
                     b.Navigation("Admin");
                 });
@@ -929,11 +1035,6 @@ namespace ProjectSEM3.Migrations
                         .HasForeignKey("OrderId")
                         .HasConstraintName("FK__OrderDeta__order__245D67DE");
 
-                    b.HasOne("ProjectSEM3.Entities.ProductColor", "ProductColor")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("ProductColorId")
-                        .HasConstraintName("FK__OrderDeta__produ__25518C17");
-
                     b.HasOne("ProjectSEM3.Entities.Product", "Product")
                         .WithMany("OrderDetails")
                         .HasForeignKey("ProductId")
@@ -947,8 +1048,6 @@ namespace ProjectSEM3.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
-
-                    b.Navigation("ProductColor");
 
                     b.Navigation("ProductSize");
                 });
@@ -1021,16 +1120,6 @@ namespace ProjectSEM3.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ProjectSEM3.Entities.ProductColor", b =>
-                {
-                    b.HasOne("ProjectSEM3.Entities.Product", "Product")
-                        .WithMany("ProductColors")
-                        .HasForeignKey("ProductId")
-                        .HasConstraintName("FK__ProductCo__produ__2B0A656D");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("ProjectSEM3.Entities.ProductForChild", b =>
                 {
                     b.HasOne("ProjectSEM3.Entities.Product", "Product")
@@ -1060,17 +1149,18 @@ namespace ProjectSEM3.Migrations
 
             modelBuilder.Entity("ProjectSEM3.Entities.ProductSize", b =>
                 {
-                    b.HasOne("ProjectSEM3.Entities.ProductColor", "ProductColor")
+                    b.HasOne("ProjectSEM3.Entities.Product", "Product")
                         .WithMany("ProductSizes")
-                        .HasForeignKey("ProductColorId")
-                        .HasConstraintName("FK__ProductSi__produ__2EDAF651");
+                        .HasForeignKey("ProductId")
+                        .IsRequired()
+                        .HasConstraintName("FK__ProductSi__produ__3A4CA8FD");
 
                     b.HasOne("ProjectSEM3.Entities.Size", "Size")
                         .WithMany("ProductSizes")
                         .HasForeignKey("SizeId")
                         .HasConstraintName("FK__ProductSi__size___2FCF1A8A");
 
-                    b.Navigation("ProductColor");
+                    b.Navigation("Product");
 
                     b.Navigation("Size");
                 });
@@ -1095,6 +1185,11 @@ namespace ProjectSEM3.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ProjectSEM3.Entities.Admin", b =>
+                {
+                    b.Navigation("News");
+                });
+
             modelBuilder.Entity("ProjectSEM3.Entities.Category", b =>
                 {
                     b.Navigation("CategoryDetails");
@@ -1107,9 +1202,19 @@ namespace ProjectSEM3.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("ProjectSEM3.Entities.Collection", b =>
+                {
+                    b.Navigation("AdCampaigns");
+                });
+
             modelBuilder.Entity("ProjectSEM3.Entities.Discount", b =>
                 {
                     b.Navigation("DiscountProducts");
+                });
+
+            modelBuilder.Entity("ProjectSEM3.Entities.KindOfSport", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ProjectSEM3.Entities.Order", b =>
@@ -1130,24 +1235,15 @@ namespace ProjectSEM3.Migrations
                 {
                     b.Navigation("Carts");
 
+                    b.Navigation("DiscountProducts");
+
                     b.Navigation("Favouries");
 
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("ProductColors");
 
                     b.Navigation("ProductForChildren");
 
                     b.Navigation("ProductReviews");
-                });
-
-            modelBuilder.Entity("ProjectSEM3.Entities.ProductColor", b =>
-                {
-                    b.Navigation("Carts");
-
-                    b.Navigation("Favouries");
-
-                    b.Navigation("OrderDetails");
 
                     b.Navigation("ProductSizes");
                 });

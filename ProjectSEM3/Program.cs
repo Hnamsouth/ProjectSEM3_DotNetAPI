@@ -1,10 +1,13 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
+using ProjectSEM3.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ProjectSEM3.Services;
 
 DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
@@ -35,11 +38,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
-<<<<<<< HEAD
-    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Hienlocal"))
-=======
     opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Local-south"))
->>>>>>> 8094aa941a17b6d35d9492abefe691040f0edd52
 );
 
 // add authentication
@@ -51,7 +50,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateAudience = true,
         ValidateIssuerSigningKey = true,
         ValidateLifetime = true,
-        ValidIssuer = builder.Configuration["Jwt:Issure"],
+        ClockSkew = TimeSpan.Zero, // Thiết lập độ lệch thời gian là 0
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
@@ -66,6 +66,11 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("Auth", policy => policy.RequireAuthenticatedUser());
 });
+
+// add email config
+builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSetting"));
+// add email service
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 

@@ -33,10 +33,10 @@ namespace ProjectSEM3.Controllers.Auth
         }
 
         [HttpGet]
-        [AllowAnonymous]
         async public Task<IActionResult> get()
         {
             var ad = await  _context.Admins.Include(e=>e.User).ToListAsync<Admin>();
+            if(ad == null) return Unauthorized();
             return Ok(ad);
         }
     }

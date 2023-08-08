@@ -9,6 +9,8 @@ namespace ProjectSEM3.DTOs
 
         public string Name { get; set; } = null!;
 
+        public byte SizeType { get; set; }
+
         public virtual List<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
     }
 }
