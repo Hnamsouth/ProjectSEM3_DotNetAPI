@@ -24,7 +24,7 @@ namespace ProjectSEM3.Controllers.Auth
             _context = context;
             _config = config;
         }
-
+        // dadafas
         [HttpPost, Route("register")]
         [AllowAnonymous]
         async public Task<IActionResult> Register(UserRegister data)
@@ -48,7 +48,7 @@ namespace ProjectSEM3.Controllers.Auth
                 //new Claim("IT",user.JobTitle)
             };
             var ad = user.Admins;
-            if(ad.Any())
+            if (ad.Any())
             {
                 claims = claims.Append(new Claim(ClaimTypes.Role, ad.First().Role)).ToArray();
             }
@@ -63,22 +63,55 @@ namespace ProjectSEM3.Controllers.Auth
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        private string GJWT(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+            var issuer = _config["Jwt:Issuer"];
+            var audience = _config["Jwt:Audience"];
+
+            var claims = new[]
+            {
+            new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
+            new Claim(ClaimTypes.Name,user.Username),
+            new Claim(ClaimTypes.Email,user.Email)
+        };
+
+            var ad = user.Admins;
+            if (ad.Any())
+            {
+                claims = claims.Append(new Claim(ClaimTypes.Role, ad.First().Role)).ToArray();
+            }
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddHours(1),
+                Issuer = issuer,
+                Audience = audience,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
         [HttpPost, Route("login")]
         [AllowAnonymous]
         async public Task<IActionResult> Login(UserLogin data)
         {
-            var u = await _context.Users.Where(a => a.Username.Equals(data.UserName)).Include(e=>e.Admins).FirstAsync();
+            var u = await _context.Users.Where(a => a.Username.Equals(data.UserName)).Include(e => e.Admins).FirstAsync();
             if (u == null) return NotFound();
 
             var checkPW = BCrypt.Net.BCrypt.Verify(data.Password, u.Password);
             if (!checkPW) return Unauthorized();
 
 
-            return Ok(new UserData { Username = u.Username, Email = u.Email, Token = GenerateJWT(u) });
+            return Ok(new UserData { Username = u.Username, Email = u.Email, Token = GJWT(u) });
         }
 
-        [HttpGet,Route("profile")]
-        async public Task<IActionResult> getProfile()
+        [HttpGet, Route("profile")]
+        async public Task<IActionResult> GetProfile()
         {
             // xac thuc danh tinh user
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -97,5 +130,6 @@ namespace ProjectSEM3.Controllers.Auth
             return Unauthorized();
 
         }
+
     }
 }

@@ -29,7 +29,7 @@ namespace ProjectSEM3.Controllers
         [HttpGet]
         public async Task<IActionResult> GetByUserId(int userId)
         {
-            var itemsInCart = await _context.Carts.Where(c => c.UserId == userId).ToListAsync();
+            var itemsInCart = await _context.Carts.Where(c => c.UserId == userId).Include(e => e.Product).ToListAsync();
             List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
             return Ok(list);
         }
