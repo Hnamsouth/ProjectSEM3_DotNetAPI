@@ -8,7 +8,7 @@ namespace ProjectSEM3.Controllers
 {
     [Route("api/favorite")]
     [ApiController]
-    public class FavoriteController : Controller
+    public class FavoriteController : ControllerBase
     {
         private readonly ProjectSem3Context _context;
         public FavoriteController(ProjectSem3Context context)

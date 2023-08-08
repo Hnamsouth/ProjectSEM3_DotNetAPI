@@ -77,8 +77,7 @@ namespace ProjectSEM3.Controllers
         [HttpGet, Route("upload-demo")]
         async public Task<IActionResult> Upload()
         {
-            var up = new UploadImg();
-            var rs = await up.Upload(null, null, null);
+            var rs = await UploadImg.Upload(null, null, null);
             Console.WriteLine(rs);
             return Ok(rs);
         }
