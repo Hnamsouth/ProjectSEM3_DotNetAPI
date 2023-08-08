@@ -5,35 +5,46 @@ namespace ProjectSEM3.DTOs
 	public class ProductDto
 	{
         public int Id { get; set; }
-
         public string Name { get; set; } = null!;
 
-        public decimal Price { get; set; }
+		public decimal Price { get; set; }
 
-        public string? Description { get; set; }
+		public string? Description { get; set; }
 
-        public int? CategoryId { get; set; } // shose , clothing , accessories..
+        public int? CategoryId { get; set; }
 
-        public int? KindofsportId { get; set; } // FootBall, Running , Training...
+    public string? ColorName { get; set; }
 
-        public int? CategoryDetailId { get; set; } // shose: running, tenis , original.. or clothing: t-shirts, hoodies, jackets...
+    public byte Gender { get; set; }
 
-        public byte Gender { get; set; } //  male, female , all
+    public string Img { get; set; } = null!;
 
-        public DateTime OpenSale { get; set; } 
+    public DateTime OpenSale { get; set; }
 
-        public byte Status { get; set; } // open , close , opening soon 
+    public byte Status { get; set; }
 
-        public virtual ICollection<Cart>? Carts { get; set; } = new List<Cart>();
+    public int? CategoryDetailId { get; set; }
+
+    public int? KindofsportId { get; set; }
+
+        public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
         public virtual Category? Category { get; set; }
 
-        public virtual ICollection<Favoury>? Favouries { get; set; } = new List<Favoury>();
+    public virtual CategoryDetail? CategoryDetail { get; set; }
 
-        public virtual ICollection<OrderDetail>? OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
+
+        public virtual ICollection<Favoury> Favouries { get; set; } = new List<Favoury>();
+
+    public virtual KindOfSport? Kindofsport { get; set; }
+
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
 
-        public virtual ICollection<ProductReview>? ProductReviews { get; set; } = new List<ProductReview>();
+        public virtual ICollection<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
+
+    public virtual ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
     }
 }
 
