@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
+using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Helpers;
+using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -27,11 +29,17 @@ namespace ProjectSEM3.Controllers
         //}
 
         [HttpGet]
-        public async Task<IActionResult> GetByUserId(int userId)
+        public async Task<IActionResult> GetByUserId()
         {
-            var itemsInCart = await _context.Carts.Where(c => c.UserId == userId).Include(e => e.Product).ToListAsync();
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var Id = identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+                var itemsInCart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(Id)).Include(e => e.Product).ToListAsync();
             List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
             return Ok(list);
+            }
+            return Unauthorized();
         }
 
         [HttpPost]

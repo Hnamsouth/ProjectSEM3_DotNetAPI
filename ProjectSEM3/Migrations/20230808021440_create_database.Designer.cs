@@ -12,8 +12,8 @@ using ProjectSEM3.Entities;
 namespace ProjectSEM3.Migrations
 {
     [DbContext(typeof(ProjectSem3Context))]
-    [Migration("20230731064645_firstDB")]
-    partial class firstDB
+    [Migration("20230808021440_create_database")]
+    partial class create_database
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -732,9 +732,9 @@ namespace ProjectSEM3.Migrations
                     b.HasKey("Id")
                         .HasName("PK__ProductS__3214EC07D29ABF3C");
 
-                    b.HasIndex("ProductId");
-
                     b.HasIndex(new[] { "SizeId" }, "IX_ProductSize_SizeId");
+
+                    b.HasIndex(new[] { "ProductId" }, "IX_ProductSize_product_id");
 
                     b.ToTable("ProductSize", (string)null);
                 });
@@ -753,6 +753,9 @@ namespace ProjectSEM3.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(10)");
 
+                    b.Property<byte>("SizeType")
+                        .HasColumnType("tinyint");
+
                     b.HasKey("Id")
                         .HasName("PK__Size__3214EC07E98EF804");
 
@@ -770,6 +773,9 @@ namespace ProjectSEM3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Activate")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -777,22 +783,15 @@ namespace ProjectSEM3.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                    b.Property<string>("Token")
+                        .HasColumnType("text");
 
                     b.HasKey("Id")
                         .HasName("PK__Users__3214EC07AE7F2844");
 
-                    b.HasIndex(new[] { "Username" }, "UQ__Users__536C85E41CC69CB7")
-                        .IsUnique();
-
-                    b.HasIndex(new[] { "Email" }, "UQ__Users__A9D10534FAE63181")
+                    b.HasIndex(new[] { "Email" }, "UQ__Users__A9D10534B7ED3B19")
                         .IsUnique();
 
                     b.ToTable("Users");

@@ -17,7 +17,7 @@ namespace ProjectSEM3.DTOs
 
         public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-        public virtual Product Product { get; set; } = null!;
+        public virtual Product? Product { get; set; } = null!;
 
         public virtual Size? Size { get; set; }
     }
