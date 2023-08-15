@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Services;
+
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -34,7 +35,8 @@ namespace ProjectSEM3.Controllers.Auth
             {
                 // hash pw and token
                 var token = BCrypt.Net.BCrypt.HashString(data.Email, 10);
-                var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password);
+                var salt = BCrypt.Net.BCrypt.GenerateSalt(10);
+                var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password,salt);
                 // create new user and user info
                 var user = new User { Email = data.Email, Token = data.Email, Password = passHash };
                 await _context.Users.AddAsync(user);
@@ -91,7 +93,7 @@ namespace ProjectSEM3.Controllers.Auth
                 _config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.Now.AddHours(3),
                 signingCredentials: signatureKey
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -119,7 +121,7 @@ namespace ProjectSEM3.Controllers.Auth
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddMinutes(1),
+                Expires = DateTime.Now.AddHours(1),
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -204,12 +206,8 @@ namespace ProjectSEM3.Controllers.Auth
         {
 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null) return Unauthorized(new Check { CheckToken=false});
-            return Ok(new Check { CheckToken = true });
-        }
-        class Check
-        {
-            public bool CheckToken { get; set; }
+            if (identity == null) return Unauthorized(new { CheckToken=false});
+            return Ok(new { CheckToken = true });
         }
     }
 }

@@ -3,8 +3,8 @@ using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.DTOs
 {
-	public class ProductSizeDto
-	{
+    public class ProductSizeDto
+    {
         public int Id { get; set; }
 
         public int Qty { get; set; }
