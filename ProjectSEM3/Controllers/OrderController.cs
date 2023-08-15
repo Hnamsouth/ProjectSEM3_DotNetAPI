@@ -11,11 +11,9 @@ using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.Controllers
 {
-
     [Route("api/order")]
     [ApiController]
-    public class OrderController : ControllerBase
-    {
+    public class OrderController : ControllerBase {
         private readonly ProjectSem3Context _context;
 
         public OrderController(ProjectSem3Context context)
@@ -23,8 +21,7 @@ namespace ProjectSEM3.Controllers
             _context = context;
         }
 
-        [HttpGet,
-            Route("get")]
+        [HttpGet,Route("get")]
         async public Task<IActionResult> Get(int? id)
         {
 

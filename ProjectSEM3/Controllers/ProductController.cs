@@ -45,7 +45,8 @@ namespace ProjectSEM3.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Products.Add(new Product { Name = data.Name, Price = data.Price, Description = data.Description, CategoryId = data.CategoryId});
+                _context.Products.Add(new Product { Name = data.Name, Price = data.Price, Description = data.Description, CategoryId = data.CategoryId, KindofsportId = data.KindofsportId
+                , CategoryDetailId = data.CategoryDetailId, Gender = data.Gender, OpenSale = data.OpenSale,Status = data.Status});
                 await _context.SaveChangesAsync();
                 return Created($"/get?id={data.Id}", data);
             }

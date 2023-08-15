@@ -44,7 +44,6 @@ namespace ProjectSEM3.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.OrderDetails.Add(new OrderDetail {Qty = data.Qty, ProductId = data.ProductId, ProductColorId = data.ProductColorId, ProductSizeId = data.ProductSizeId, OrderId = data.OrderId});
                 await _context.SaveChangesAsync();
                 return Created($"/get?id={data.Id}", data);
             }
