@@ -19,8 +19,7 @@ namespace ProjectSEM3.Controllers
         {
             _context = context;
         }
-        //[HttpGet,
-        // Route("get")]
+        //[HttpGet, Route("get")]
         //async public Task<IActionResult> GetAll()
         //{
         //    var itemsInCart = await _context.Carts.ToListAsync();
