@@ -38,7 +38,7 @@ namespace ProjectSEM3.Controllers
         async public Task<IActionResult> Create(SizeDto data)
         {
             if(ModelState.IsValid) {
-                _context.Sizes.Add(new Size { Name=data.Name, SizeType = data.SizeType});
+                _context.Sizes.Add(new Size { Name=data.Name, Type = data.Type});
                 await _context.SaveChangesAsync();
                 return Created($"/get?id={data.Id}", data);
 

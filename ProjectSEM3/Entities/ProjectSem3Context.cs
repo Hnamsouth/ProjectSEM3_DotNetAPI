@@ -51,6 +51,8 @@ public partial class ProjectSem3Context : DbContext
 
     public virtual DbSet<ProductAdCampaign> ProductAdCampaigns { get; set; }
 
+    public virtual DbSet<ProductColor> ProductColors { get; set; }
+
     public virtual DbSet<ProductForChild> ProductForChildren { get; set; }
 
     public virtual DbSet<ProductReview> ProductReviews { get; set; }
@@ -67,9 +69,9 @@ public partial class ProjectSem3Context : DbContext
 
     public virtual DbSet<Voucher> Vouchers { get; set; }
 
-   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=SOUTH\\SQLEXPRESS;Initial Catalog=Project_SEM3;Integrated Security=True;TrustServerCertificate=True");
+        => optionsBuilder.UseSqlServer("Data Source=SOUTH\\SQLEXPRESS;Initial Catalog=Projectsem3;Integrated Security=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -78,10 +80,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__AdCampai__3214EC07F7E8AE31");
 
             entity.ToTable("AdCampaign");
-
-            entity.HasIndex(e => e.CollectionId, "IX_AdCampaign_collection_id");
-
-            entity.HasIndex(e => e.PartnersId, "IX_AdCampaign_partners_id");
 
             entity.Property(e => e.CollectionId).HasColumnName("collection_id");
             entity.Property(e => e.Desciption).HasColumnType("text");
@@ -106,10 +104,6 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Admins__3214EC07E6E0EE75");
 
-            entity.HasIndex(e => e.UserId, "IX_Admins_user_id");
-
-            entity.HasIndex(e => e.Role, "UQ__Admins__DA15413E248224BD").IsUnique();
-
             entity.Property(e => e.Role)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -124,24 +118,13 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Carts__3214EC07A226B5B5");
 
-            entity.HasIndex(e => e.ProductSizeId, "IX_Carts_productSize_id");
-
-            entity.HasIndex(e => e.ProductId, "IX_Carts_product_id");
-
-            entity.HasIndex(e => e.UserId, "IX_Carts_user_id");
-
             entity.Property(e => e.BuyQty).HasColumnName("buy_qty");
-            entity.Property(e => e.ProductId).HasColumnName("product_id");
-            entity.Property(e => e.ProductSizeId).HasColumnName("productSize_id");
+            entity.Property(e => e.ProductColorId).HasColumnName("product_color_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__Carts__product_i__1AD3FDA4");
-
-            entity.HasOne(d => d.ProductSize).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.ProductSizeId)
-                .HasConstraintName("FK__Carts__productSi__1CBC4616");
+            entity.HasOne(d => d.ProductColor).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.ProductColorId)
+                .HasConstraintName("FK__Carts__product_c__05D8E0BE");
 
             entity.HasOne(d => d.User).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.UserId)
@@ -152,8 +135,6 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Categori__3214EC07DF9A41C9");
 
-            entity.HasIndex(e => e.Name, "UQ__Categori__737584F60CB46E23").IsUnique();
-
             entity.Property(e => e.Name).HasMaxLength(255);
         });
 
@@ -162,10 +143,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Category__3214EC071CD2494F");
 
             entity.ToTable("CategoryDetail");
-
-            entity.HasIndex(e => e.CategoryId, "IX_CategoryDetail_category_id");
-
-            entity.HasIndex(e => e.Name, "UQ__Category__737584F67976B658").IsUnique();
 
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Name)
@@ -205,10 +182,6 @@ public partial class ProjectSem3Context : DbContext
 
             entity.ToTable("DiscountProduct");
 
-            entity.HasIndex(e => e.DiscountId, "IX_DiscountProduct_Discount_id");
-
-            entity.HasIndex(e => e.ProductId, "IX_DiscountProduct_Product_id");
-
             entity.Property(e => e.DiscountId).HasColumnName("Discount_id");
             entity.Property(e => e.EndDate).HasColumnType("datetime");
             entity.Property(e => e.ProductId).HasColumnName("Product_id");
@@ -229,10 +202,6 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Favourie__3214EC0752A82DA1");
 
-            entity.HasIndex(e => e.ProductId, "IX_Favouries_product_id");
-
-            entity.HasIndex(e => e.UserId, "IX_Favouries_user_id");
-
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -251,8 +220,6 @@ public partial class ProjectSem3Context : DbContext
 
             entity.ToTable("KindOfSport");
 
-            entity.HasIndex(e => e.Name, "UQ__KindOfSp__737584F6CDD7C52D").IsUnique();
-
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -261,8 +228,6 @@ public partial class ProjectSem3Context : DbContext
         modelBuilder.Entity<News>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__News__3214EC077F5C2BFE");
-
-            entity.HasIndex(e => e.AdminId, "IX_News_Admin_id");
 
             entity.Property(e => e.AdminId).HasColumnName("Admin_id");
             entity.Property(e => e.Content).HasColumnType("text");
@@ -286,8 +251,6 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Orders__3214EC074A5FA77D");
 
-            entity.HasIndex(e => e.UserId, "IX_Orders_user_id");
-
             entity.Property(e => e.Date)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("date");
@@ -308,27 +271,16 @@ public partial class ProjectSem3Context : DbContext
 
             entity.ToTable("OrderDetail");
 
-            entity.HasIndex(e => e.OrderId, "IX_OrderDetail_order_id");
-
-            entity.HasIndex(e => e.ProductSizeId, "IX_OrderDetail_productSize_id");
-
-            entity.HasIndex(e => e.ProductId, "IX_OrderDetail_product_id");
-
             entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.ProductId).HasColumnName("product_id");
-            entity.Property(e => e.ProductSizeId).HasColumnName("productSize_id");
+            entity.Property(e => e.ProductColorId).HasColumnName("product_color_id");
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
                 .HasForeignKey(d => d.OrderId)
                 .HasConstraintName("FK__OrderDeta__order__245D67DE");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.OrderDetails)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__OrderDeta__produ__2645B050");
-
-            entity.HasOne(d => d.ProductSize).WithMany(p => p.OrderDetails)
-                .HasForeignKey(d => d.ProductSizeId)
-                .HasConstraintName("FK__OrderDeta__produ__2739D489");
+            entity.HasOne(d => d.ProductColor).WithMany(p => p.OrderDetails)
+                .HasForeignKey(d => d.ProductColorId)
+                .HasConstraintName("FK__OrderDeta__produ__06CD04F7");
         });
 
         modelBuilder.Entity<Partner>(entity =>
@@ -346,8 +298,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Partners__3214EC07AA9DB02A");
 
             entity.ToTable("PartnersInfo");
-
-            entity.HasIndex(e => e.PartnersId, "IX_PartnersInfo_partners_id");
 
             entity.Property(e => e.Address)
                 .HasMaxLength(255)
@@ -371,10 +321,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Payment__3214EC07D75A8B65");
 
             entity.ToTable("Payment");
-
-            entity.HasIndex(e => e.OrderId, "IX_Payment_order_id");
-
-            entity.HasIndex(e => e.UserId, "IX_Payment_user_id");
 
             entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.Email)
@@ -400,17 +346,10 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Products__3214EC0726D18407");
 
-            entity.HasIndex(e => e.CategoryDetailId, "IX_Products_category_detail_id");
-
-            entity.HasIndex(e => e.CategoryId, "IX_Products_category_id");
-
-            entity.HasIndex(e => e.KindofsportId, "IX_Products_kindofsport_id");
-
             entity.Property(e => e.CategoryDetailId).HasColumnName("category_detail_id");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Description).HasColumnType("text");
             entity.Property(e => e.Gender).HasDefaultValueSql("(CONVERT([tinyint],(0)))");
-            entity.Property(e => e.Img).HasDefaultValueSql("(N'')");
             entity.Property(e => e.KindofsportId).HasColumnName("kindofsport_id");
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.OpenSale)
@@ -438,10 +377,6 @@ public partial class ProjectSem3Context : DbContext
                 .HasNoKey()
                 .ToTable("ProductAdCampaign");
 
-            entity.HasIndex(e => e.AdcampaignId, "IX_ProductAdCampaign_adcampaign_id");
-
-            entity.HasIndex(e => e.ProductId, "IX_ProductAdCampaign_product_id");
-
             entity.Property(e => e.AdcampaignId).HasColumnName("adcampaign_id");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
 
@@ -454,13 +389,30 @@ public partial class ProjectSem3Context : DbContext
                 .HasConstraintName("FK__ProductAd__produ__55F4C372");
         });
 
+        modelBuilder.Entity<ProductColor>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Prod_color");
+
+            entity.ToTable("ProductColor");
+
+            entity.Property(e => e.Img)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductColors)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("FK__ProductCo__produ__00200768");
+        });
+
         modelBuilder.Entity<ProductForChild>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__ProductF__3214EC071774F8E7");
 
             entity.ToTable("ProductForChild");
-
-            entity.HasIndex(e => e.ProductId, "IX_ProductForChild_product_id");
 
             entity.Property(e => e.ProductId).HasColumnName("product_id");
 
@@ -474,10 +426,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__ProductR__3214EC075CE6C025");
 
             entity.ToTable("ProductReview");
-
-            entity.HasIndex(e => e.ProductId, "IX_ProductReview_product_id");
-
-            entity.HasIndex(e => e.UserId, "IX_ProductReview_user_id");
 
             entity.Property(e => e.Comment).HasColumnType("text");
             entity.Property(e => e.CreatedAt)
@@ -502,16 +450,11 @@ public partial class ProjectSem3Context : DbContext
 
             entity.ToTable("ProductSize");
 
-            entity.HasIndex(e => e.SizeId, "IX_ProductSize_SizeId");
+            entity.Property(e => e.ProductColorId).HasColumnName("product_color_id");
 
-            entity.HasIndex(e => e.ProductId, "IX_ProductSize_product_id");
-
-            entity.Property(e => e.ProductId).HasColumnName("product_id");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.ProductSizes)
-                .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ProductSi__produ__3A4CA8FD");
+            entity.HasOne(d => d.ProductColor).WithMany(p => p.ProductSizes)
+                .HasForeignKey(d => d.ProductColorId)
+                .HasConstraintName("FK__ProductSi__produ__04E4BC85");
 
             entity.HasOne(d => d.Size).WithMany(p => p.ProductSizes)
                 .HasForeignKey(d => d.SizeId)
@@ -524,8 +467,6 @@ public partial class ProjectSem3Context : DbContext
 
             entity.ToTable("Size");
 
-            entity.HasIndex(e => e.Name, "UQ__Size__737584F6F8BC285F").IsUnique();
-
             entity.Property(e => e.Name)
                 .HasMaxLength(10)
                 .IsUnicode(false);
@@ -535,7 +476,7 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Users__3214EC07AE7F2844");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534B7ED3B19").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D105343F77BE89").IsUnique();
 
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
@@ -549,8 +490,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.CardNumber).HasName("PK__UserCard__A4E9FFE8CFE115A2");
 
             entity.ToTable("UserCard");
-
-            entity.HasIndex(e => e.UserId, "IX_UserCard_user_id");
 
             entity.Property(e => e.CardNumber).ValueGeneratedNever();
             entity.Property(e => e.Cvc).HasColumnName("CVC");
@@ -572,8 +511,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__UserInfo__3214EC07F4ADAEF8");
 
             entity.ToTable("UserInfo");
-
-            entity.HasIndex(e => e.UserId, "IX_UserInfo_user_id");
 
             entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.Birthday).HasColumnType("date");

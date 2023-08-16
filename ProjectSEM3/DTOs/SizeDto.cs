@@ -7,7 +7,7 @@ namespace ProjectSEM3.DTOs
 
         public int? Id { get; set; }
         public string Name { get; set; } = null!;
-        public byte SizeType { get; set; }
+        public bool Type { get; set; }
         public virtual List<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
     }
 }

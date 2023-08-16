@@ -32,7 +32,7 @@ namespace ProjectSEM3.Controllers
 
             if (id == null)
             {
-                
+                /*
                 var products = await _context.Products.Select(p => new {
                     Id=p.Id,
                     Name=p.Name,
@@ -62,11 +62,11 @@ namespace ProjectSEM3.Controllers
                         name=p.Kindofsport.Name
                     }
                 }).ToListAsync();
-                
+                */
                 /*
                 var products= await _context.Products.Include(e => e.Category).Include(e => e.CategoryDetail).Include(e => e.Kindofsport).ToListAsync();
                 List<ProductDemo> pl = Mapper<Product, ProductDemo>.MapList(products);*/
-                return Ok(products);
+                return Ok();
             }
             var product = await _context.Products.Include(e => e.Category).Include(e => e.CategoryDetail).Include(e => e.Kindofsport).Where(e=>e.Id == id).FirstOrDefaultAsync();
             if (product == null) { return NotFound(); }
@@ -78,6 +78,7 @@ namespace ProjectSEM3.Controllers
         [HttpPost]
         async public Task<IActionResult> Create([FromForm]ProductFormCreate data)
         {
+            
             if (ModelState.IsValid)
             {
                 var p = new Product
@@ -88,16 +89,14 @@ namespace ProjectSEM3.Controllers
                     CategoryId = data.CategoryId,
                     KindofsportId = data.KindofsportId,
                     CategoryDetailId = data.CategoryDetailId,
-                    ColorName=data.ColorName,
                     Gender = data.Gender,
                     OpenSale = data.OpenSale,
                     Status = data.Status,
-                    Img = "p"
                 };
                 await _context.Products.AddAsync(p);
                 await _context.SaveChangesAsync();
 
-                
+                /*
                 var pls = new List<CdnItem>();
                 var index = 0;
                 foreach(var file in data.Img)
@@ -108,9 +107,10 @@ namespace ProjectSEM3.Controllers
                 p.Img = "Products/sp" + p.Id;
                 _context.Products.Update(p);
                 await _context.SaveChangesAsync();
-                
+                */
                 return Ok(await _context.Products.Include(e => e.Category).Include(e => e.CategoryDetail).Include(e => e.Kindofsport).Where(e => e.Id == p.Id).FirstOrDefaultAsync());
             }
+            
             return BadRequest();
         }
 
