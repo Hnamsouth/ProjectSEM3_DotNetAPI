@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
 using ProjectSEM3.Entities;
@@ -10,6 +11,7 @@ namespace ProjectSEM3.Controllers
 {
     [Route("api/cart")]
     [ApiController]
+    [Authorize(Policy ="Auth")]
     public class CartController:ControllerBase
     {
         private readonly ProjectSem3Context _context;
@@ -17,8 +19,7 @@ namespace ProjectSEM3.Controllers
         {
             _context = context;
         }
-        //[HttpGet,
-        // Route("get")]
+        //[HttpGet, Route("get")]
         //async public Task<IActionResult> GetAll()
         //{
         //    var itemsInCart = await _context.Carts.ToListAsync();

@@ -76,14 +76,6 @@ namespace ProjectSEM3.Controllersoucher
             }
             return NotFound();
         }
-
-        [HttpGet, Route("upload-demo")]
-        async public Task<IActionResult> Upload()
-        {
-            var rs = await UploadImg.Upload(null, null, null);
-            Console.WriteLine(rs);
-            return Ok(rs);
-        }
         [HttpGet, Route("upload-getImg")]
         async public Task<IActionResult> GetImgFolder()
         {

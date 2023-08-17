@@ -27,10 +27,10 @@ namespace ProjectSEM3.Controllers
         {
             if (id == null)
             {
-                var categories = await _context.Categories.Include(e=>e.Products).ToListAsync();
+                var categories = await _context.Categories.Include(e => e.CategoryDetails).ToListAsync();
                 return Ok(categories);
             }
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories.Include(e=>e.CategoryDetails).Where(e=>e.Id.Equals(id)).FirstOrDefaultAsync();
             
             if (category == null) { return NotFound(); }
             return Ok(category);
@@ -76,10 +76,11 @@ namespace ProjectSEM3.Controllers
             return NotFound();
         }
 
-        [HttpGet,Route("upload-demo")]
-        async public Task<IActionResult> Upload()
+        [HttpPost,Route("upload-demo")]
+        async public Task<IActionResult> Upload([FromForm]IFormFile img)
         {
-            var rs = await UploadImg.Upload(null,null,null);
+            
+            var rs = await UploadImg.Upload(img, "Product","SP1","#PPSP1");
             Console.WriteLine(rs);
             return Ok(rs);
         }

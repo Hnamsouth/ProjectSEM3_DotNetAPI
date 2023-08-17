@@ -3,8 +3,8 @@ using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.DTOs
 {
-	public class ProductReviewDto
-	{
+    public class ProductReviewDto
+    {
         public int Id { get; set; }
 
         public string? Comment { get; set; }
