@@ -42,7 +42,7 @@ namespace ProjectSEM3.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.ProductSizes.Add(new ProductSize { Qty = data.Qty, SizeId = data.SizeId });
+                await _context.ProductSizes.AddAsync(new ProductSize { Qty = data.Qty, SizeId = data.SizeId, ProductColorId = data.ProductColorId });
                 await _context.SaveChangesAsync();
                 return Created($"/get?id={data.Id}", data);
 

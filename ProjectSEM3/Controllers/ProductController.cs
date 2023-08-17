@@ -63,10 +63,10 @@ namespace ProjectSEM3.Controllers
                     }
                 }).ToListAsync();
                 */
-                /*
-                var products= await _context.Products.Include(e => e.Category).Include(e => e.CategoryDetail).Include(e => e.Kindofsport).ToListAsync();
-                List<ProductDemo> pl = Mapper<Product, ProductDemo>.MapList(products);*/
-                return Ok();
+                
+                var products= await _context.Products.ToListAsync();
+                List<ProductDemo> pl = Mapper<Product, ProductDemo>.MapList(products);
+                return Ok(pl);
             }
             var product = await _context.Products.Include(e => e.Category).Include(e => e.CategoryDetail).Include(e => e.Kindofsport).Where(e=>e.Id == id).FirstOrDefaultAsync();
             if (product == null) { return NotFound(); }
@@ -90,7 +90,7 @@ namespace ProjectSEM3.Controllers
                     KindofsportId = data.KindofsportId,
                     CategoryDetailId = data.CategoryDetailId,
                     Gender = data.Gender,
-                    OpenSale = data.OpenSale,
+                    OpenSale = DateTime.ParseExact(data.OpenSale, "dd/MM/yyyy", null),
                     Status = data.Status,
                 };
                 await _context.Products.AddAsync(p);

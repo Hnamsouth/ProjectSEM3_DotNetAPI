@@ -165,7 +165,7 @@ namespace ProjectSEM3.Controllers.Auth
         {
             // xac thuc danh tinh user
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
+            if (identity.IsAuthenticated)
             {
                 var userClaims = identity.Claims;
                 var Id = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;

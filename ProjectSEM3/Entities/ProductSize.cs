@@ -13,6 +13,10 @@ public partial class ProductSize
 
     public int? ProductColorId { get; set; }
 
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+
     public virtual ProductColor? ProductColor { get; set; }
 
     public virtual Size? Size { get; set; }

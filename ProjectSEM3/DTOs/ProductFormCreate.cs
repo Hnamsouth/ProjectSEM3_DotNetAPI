@@ -10,16 +10,14 @@ namespace ProjectSEM3.DTOs
 
         public string? Description { get; set; }
 
-        public int? CategoryId { get; set; }
-        public string? ColorName { get; set; }
-
         public byte Gender { get; set; }
 
         public IFormFileCollection? Img { get; set; }
 
-        public DateTime OpenSale { get; set; }
+        public string OpenSale { get; set; }
 
         public byte Status { get; set; }
+        public int? CategoryId { get; set; }
 
         public int? CategoryDetailId { get; set; }
 

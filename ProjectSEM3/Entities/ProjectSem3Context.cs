@@ -119,12 +119,12 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Carts__3214EC07A226B5B5");
 
             entity.Property(e => e.BuyQty).HasColumnName("buy_qty");
-            entity.Property(e => e.ProductColorId).HasColumnName("product_color_id");
+            entity.Property(e => e.ProductSizeId).HasColumnName("product_size_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.ProductColor).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.ProductColorId)
-                .HasConstraintName("FK__Carts__product_c__05D8E0BE");
+            entity.HasOne(d => d.ProductSize).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.ProductSizeId)
+                .HasConstraintName("FK__Carts__product_s__09A971A2");
 
             entity.HasOne(d => d.User).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.UserId)
@@ -272,15 +272,15 @@ public partial class ProjectSem3Context : DbContext
             entity.ToTable("OrderDetail");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.ProductColorId).HasColumnName("product_color_id");
+            entity.Property(e => e.ProductSizeId).HasColumnName("product_size_id");
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
                 .HasForeignKey(d => d.OrderId)
                 .HasConstraintName("FK__OrderDeta__order__245D67DE");
 
-            entity.HasOne(d => d.ProductColor).WithMany(p => p.OrderDetails)
-                .HasForeignKey(d => d.ProductColorId)
-                .HasConstraintName("FK__OrderDeta__produ__06CD04F7");
+            entity.HasOne(d => d.ProductSize).WithMany(p => p.OrderDetails)
+                .HasForeignKey(d => d.ProductSizeId)
+                .HasConstraintName("FK__OrderDeta__produ__0A9D95DB");
         });
 
         modelBuilder.Entity<Partner>(entity =>

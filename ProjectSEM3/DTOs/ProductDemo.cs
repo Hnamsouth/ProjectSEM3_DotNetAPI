@@ -28,11 +28,11 @@ namespace ProjectSEM3.DTOs
         public int? CategoryDetailId { get; set; }
 
         public int? KindofsportId { get; set; }
-
+        /*
         public virtual CategoryDetailDto? CategoryDetail { get; set; }
 
         public virtual KindOfSportDto? Kindofsport { get; set; }
-        public virtual CategoryDto? Category { get; set; }
+        public virtual CategoryDto? Category { get; set; }*/
 
 
     }
