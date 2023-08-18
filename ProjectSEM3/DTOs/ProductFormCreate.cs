@@ -12,13 +12,9 @@ namespace ProjectSEM3.DTOs
 
         public byte Gender { get; set; }
 
-        public IFormFileCollection? Img { get; set; }
-
-        public string OpenSale { get; set; }
+        public DateTime OpenSale { get; set; }
 
         public byte Status { get; set; }
-        public int? CategoryId { get; set; }
-
         public int? CategoryDetailId { get; set; }
 
         public int? KindofsportId { get; set; }

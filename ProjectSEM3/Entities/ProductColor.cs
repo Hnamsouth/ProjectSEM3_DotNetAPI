@@ -9,11 +9,11 @@ public partial class ProductColor
 
     public string Name { get; set; } = null!;
 
-    public string Img { get; set; } = null!;
-
     public int? ProductId { get; set; }
 
     public virtual Product? Product { get; set; }
+
+    public virtual ICollection<ProductColorImage> ProductColorImages { get; set; } = new List<ProductColorImage>();
 
     public virtual ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
 }

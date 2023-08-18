@@ -53,6 +53,8 @@ public partial class ProjectSem3Context : DbContext
 
     public virtual DbSet<ProductColor> ProductColors { get; set; }
 
+    public virtual DbSet<ProductColorImage> ProductColorImages { get; set; }
+
     public virtual DbSet<ProductForChild> ProductForChildren { get; set; }
 
     public virtual DbSet<ProductReview> ProductReviews { get; set; }
@@ -347,7 +349,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Products__3214EC0726D18407");
 
             entity.Property(e => e.CategoryDetailId).HasColumnName("category_detail_id");
-            entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Description).HasColumnType("text");
             entity.Property(e => e.Gender).HasDefaultValueSql("(CONVERT([tinyint],(0)))");
             entity.Property(e => e.KindofsportId).HasColumnName("kindofsport_id");
@@ -361,10 +362,6 @@ public partial class ProjectSem3Context : DbContext
             entity.HasOne(d => d.CategoryDetail).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryDetailId)
                 .HasConstraintName("FK__Products__catego__41EDCAC5");
-
-            entity.HasOne(d => d.Category).WithMany(p => p.Products)
-                .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__Products__catego__2DE6D218");
 
             entity.HasOne(d => d.Kindofsport).WithMany(p => p.Products)
                 .HasForeignKey(d => d.KindofsportId)
@@ -395,9 +392,6 @@ public partial class ProjectSem3Context : DbContext
 
             entity.ToTable("ProductColor");
 
-            entity.Property(e => e.Img)
-                .HasMaxLength(255)
-                .IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -406,6 +400,33 @@ public partial class ProjectSem3Context : DbContext
             entity.HasOne(d => d.Product).WithMany(p => p.ProductColors)
                 .HasForeignKey(d => d.ProductId)
                 .HasConstraintName("FK__ProductCo__produ__00200768");
+        });
+
+        modelBuilder.Entity<ProductColorImage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ProductC__3214EC0744F31D6A");
+
+            entity.ToTable("ProductColorImage");
+
+            entity.Property(e => e.AssetId)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("asset_id");
+            entity.Property(e => e.Folder)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.ProductColorId).HasColumnName("product_color_id");
+            entity.Property(e => e.PublicId)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("publicId");
+            entity.Property(e => e.Url)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.ProductColor).WithMany(p => p.ProductColorImages)
+                .HasForeignKey(d => d.ProductColorId)
+                .HasConstraintName("FK__ProductCo__produ__0D7A0286");
         });
 
         modelBuilder.Entity<ProductForChild>(entity =>

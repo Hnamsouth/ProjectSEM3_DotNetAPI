@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ProjectSEM3.DTOs;
 using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
@@ -29,86 +30,40 @@ namespace ProjectSEM3.Controllers
         [HttpGet]
         async public Task<IActionResult> Get(int? id)
         {
-
             if (id == null)
             {
-                /*
-                var products = await _context.Products.Select(p => new {
-                    Id=p.Id,
-                    Name=p.Name,
-                    Price = p.Price,
-                    Description = p.Description,
-                    ColorName = p.ColorName,
-                    Gender = p.Gender,
-                    Img = p.Img,
-                    OpenSale = p.OpenSale,
-                    Status = p.Status,
-                    CategoryId = p.CategoryId,
-                    CategoryDetailId = p.CategoryDetailId,
-                    KindofsportId = p.KindofsportId,
-                    categoryDetail = new
-                    {
-                        id = p.CategoryDetail.Id,
-                        name = p.CategoryDetail.Name,
-                    },
-                    Category = new
-                    {
-                        id = p.CategoryDetail.CategoryId,
-                        name = p.CategoryDetail.Category.Name
-                    },
-                    kindofsport = new
-                    {
-                        id=p.KindofsportId,
-                        name=p.Kindofsport.Name
-                    }
-                }).ToListAsync();
-                */
-                
-                var products= await _context.Products.ToListAsync();
-                List<ProductDemo> pl = Mapper<Product, ProductDemo>.MapList(products);
-                return Ok(pl);
+                var products = await _context.Products.
+                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
+                Include(e => e.Kindofsport).
+                Include(e => e.ProductColors).ThenInclude(c => c.ProductColorImages).
+                Include(e => e.ProductColors).ThenInclude(i => i.ProductSizes).
+                ToListAsync();
+                return Ok(products);
             }
-            var product = await _context.Products.Include(e => e.Category).Include(e => e.CategoryDetail).Include(e => e.Kindofsport).Where(e=>e.Id == id).FirstOrDefaultAsync();
+            var product = await _context.Products.
+                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
+                Include(e => e.Kindofsport).
+                Include(e => e.ProductColors).ThenInclude(i => i.ProductColorImages).
+                Include(e => e.ProductColors).ThenInclude(i => i.ProductSizes).
+                Where(e=>e.Id == id).FirstOrDefaultAsync();
             if (product == null) { return NotFound(); }
-            //ProductDemo pd = Mapper<Product, ProductDemo>.Map(product);
             return Ok(product);
         }
 
         // POST api/<CategoryController>
         [HttpPost]
-        async public Task<IActionResult> Create([FromForm]ProductFormCreate data)
+        async public Task<IActionResult> Create(ProductFormCreate data)
         {
             
             if (ModelState.IsValid)
             {
-                var p = new Product
-                {
-                    Name = data.Name,
-                    Price = data.Price,
-                    Description = data.Description,
-                    CategoryId = data.CategoryId,
-                    KindofsportId = data.KindofsportId,
-                    CategoryDetailId = data.CategoryDetailId,
-                    Gender = data.Gender,
-                    OpenSale = DateTime.ParseExact(data.OpenSale, "dd/MM/yyyy", null),
-                    Status = data.Status,
-                };
+                var p = Mapper<ProductFormCreate,Product>.Map(data);
                 await _context.Products.AddAsync(p);
                 await _context.SaveChangesAsync();
 
-                /*
-                var pls = new List<CdnItem>();
-                var index = 0;
-                foreach(var file in data.Img)
-                {
-                    pls.Add(await UploadImg.Upload(file, "Products/sp"+p.Id, (data.Name + index).Trim(), "#PP" + data.Name.Trim()));
-                    index++;
-                }
-                p.Img = "Products/sp" + p.Id;
-                _context.Products.Update(p);
-                await _context.SaveChangesAsync();
-                */
-                return Ok(await _context.Products.Include(e => e.Category).Include(e => e.CategoryDetail).Include(e => e.Kindofsport).Where(e => e.Id == p.Id).FirstOrDefaultAsync());
+                var rs = await _context.Products.Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
+                        Include(e => e.Kindofsport).Where(e => e.Id == p.Id).FirstOrDefaultAsync();
+                return Ok(rs);
             }
             
             return BadRequest();
@@ -116,13 +71,31 @@ namespace ProjectSEM3.Controllers
 
         [HttpPost]
         [Route("image")]
-        public IActionResult Index([FromForm]ProductDemo image)
+        public IActionResult Index([FromForm] ProductColorCreate FormData)
         {
-            if (ModelState.IsValid)
+            try
             {
-                return Ok(image);
+                //var data = UploadImg.Upload(FormData.Img[0], "Products/color1", "productname", "#PPColor1");
+                return Ok();
             }
-            return BadRequest();
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("get-image")]
+        public IActionResult GetImg()
+        {
+            try
+            {
+                var data = UploadImg.getImg("Products/sp6");
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut]
