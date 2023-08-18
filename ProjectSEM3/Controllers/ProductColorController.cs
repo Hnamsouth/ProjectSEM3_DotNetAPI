@@ -22,12 +22,12 @@ namespace ProjectSEM3.Controllers
         [HttpGet]
         async public Task<IActionResult> Get(int? id)
         {
-            if (id != null)
+            if (id == null)
             {
                 var pcls = await _context.ProductColors.Include(e=>e.ProductColorImages).ToListAsync();
                 return Ok(pcls);
             }
-            var pcl= await _context.ProductColors.Include(e => e.ProductColorImages).Where(c=>c.ProductId.Equals(id)).FirstOrDefaultAsync();
+            var pcl= await _context.ProductColors.Include(e => e.ProductColorImages).Where(c=>c.ProductId == id).ToListAsync();
             if(pcl==null) return NotFound();
             return Ok(pcl);
         }

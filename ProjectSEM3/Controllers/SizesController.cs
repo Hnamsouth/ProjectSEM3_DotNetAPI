@@ -21,16 +21,11 @@ namespace ProjectSEM3.Controllers
             _context = context;
         }
 
-        [HttpGet,Route("get")]
-        async public Task<IActionResult> Get(int? id)
+        [HttpGet]
+        async public Task<IActionResult> Get()
         {
             var s = await _context.Sizes.ToListAsync();
             if (s==null) return NotFound();
-            if (id != null)
-            {
-                var ss = await _context.Sizes.FindAsync(id);
-                return Ok(ss);
-            }
             return Ok(s);
         }
 
@@ -40,7 +35,7 @@ namespace ProjectSEM3.Controllers
             if(ModelState.IsValid) {
                 _context.Sizes.Add(new Size { Name=data.Name, Type = data.Type});
                 await _context.SaveChangesAsync();
-                return Created($"/get?id={data.Id}", data);
+                return Created($"/?id={data.Id}", data);
 
             }
             return BadRequest();
