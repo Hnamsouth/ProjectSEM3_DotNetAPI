@@ -99,11 +99,12 @@ namespace ProjectSEM3.Controllers
         }
 
         [HttpPut]
-        async public Task<IActionResult> Update(Product data)
+        async public Task<IActionResult> Update(ProductFormCreate data)
         {
             if (ModelState.IsValid)
             {
-                _context.Products.Update(data);
+                var p = Mapper<ProductFormCreate, Product>.Map(data);
+                _context.Products.Update(p);
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
