@@ -38,7 +38,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
-    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Local-south"))
+    opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Hienlocal"))
 );
 
 // add authentication
@@ -90,7 +90,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 // use cors
-app.UseCors();
+app.UseCors("AllowPostman");
 
 app.Run();
 
