@@ -106,7 +106,10 @@ namespace ProjectSEM3.Controllers
                 var p = Mapper<ProductFormCreate, Product>.Map(data);
                 _context.Products.Update(p);
                 await _context.SaveChangesAsync();
-                return NoContent();
+
+               var rs = await _context.Products.Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
+                        Include(e => e.Kindofsport).Where(e => e.Id == p.Id).FirstOrDefaultAsync();
+                return Ok(rs);
             }
             return BadRequest();
         }

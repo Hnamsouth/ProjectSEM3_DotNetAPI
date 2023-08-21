@@ -184,7 +184,6 @@ namespace ProjectSEM3.Controllers.Auth
         [HttpGet, Route("test-profile"),AllowAnonymous]
         async public Task<IActionResult> GetProfileDemo(int? id)
         {
-            var user = await _context.Users.Include(e => e.UserInfos).Where(c => c.Id == id).FirstOrDefaultAsync();
             var UInfo = await _context.UserInfos.Include(e => e.User).Where(e => e.UserId == id).FirstOrDefaultAsync();
             if (UInfo == null) return NotFound();
             return Ok(UInfo);

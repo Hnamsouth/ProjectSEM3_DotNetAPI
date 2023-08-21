@@ -1,7 +1,8 @@
 ﻿namespace ProjectSEM3.DTOs
 {
-    public class ProductColorCreate
+    public class ProductColorUpdate
     {
+        public int Id { get; set; }
         public string? Name { get; set; }
 
         public int? ProductId { get; set; }
