@@ -3,13 +3,17 @@ using System.Collections.Generic;
 
 namespace ProjectSEM3.Entities;
 
-public partial class Size
+public partial class ProductColor
 {
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
 
-    public bool Type { get; set; } // true: string, false: number
+    public int? ProductId { get; set; }
+
+    public virtual Product? Product { get; set; }
+
+    public virtual ICollection<ProductColorImage> ProductColorImages { get; set; } = new List<ProductColorImage>();
 
     public virtual ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
 }

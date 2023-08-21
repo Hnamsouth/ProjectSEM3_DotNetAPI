@@ -80,9 +80,10 @@ namespace ProjectSEM3.Controllers
         [HttpGet, Route("upload-demo")]
         async public Task<IActionResult> Upload()
         {
+            /*
             var rs = await UploadImg.Upload(null, null, null);
-            Console.WriteLine(rs);
-            return Ok(rs);
+            Console.WriteLine(rs);*/
+            return Ok();
         }
         [HttpGet, Route("upload-getImg")]
         async public Task<IActionResult> GetImgFolder()

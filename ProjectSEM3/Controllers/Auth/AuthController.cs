@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Services;
+
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -34,11 +35,13 @@ namespace ProjectSEM3.Controllers.Auth
             {
                 // hash pw and token
                 var token = BCrypt.Net.BCrypt.HashString(data.Email, 10);
-                var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password);
+                var salt = BCrypt.Net.BCrypt.GenerateSalt(10);
+                var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password,salt);
                 // create new user and user info
                 var user = new User { Email = data.Email, Token = data.Email, Password = passHash };
                 await _context.Users.AddAsync(user);
-                var userInfo = new UserInfo { Gender = data.Gender, Birthday = data.Birthday, Name = data.FirstName + data.LastName };
+                await _context.SaveChangesAsync();
+                var userInfo = new UserInfo { Gender = data.Gender, Birthday = data.Birthday, Name = data.FirstName + data.LastName,UserId= user.Id };
                 await _context.UserInfos.AddAsync(userInfo);
                 // save user
                 await _context.SaveChangesAsync();
@@ -59,7 +62,8 @@ namespace ProjectSEM3.Controllers.Auth
                 var token = BCrypt.Net.BCrypt.HashString(data.email, 10);
                 var user = new User { Email = data.email, Token = data.email };
                 await _context.Users.AddAsync(user);
-                var userInfo = new UserInfo {  Name = data.family_name + data.given_name};
+                await _context.SaveChangesAsync();
+                var userInfo = new UserInfo {  Name = data.family_name + data.given_name,UserId= user.Id};
                 await _context.UserInfos.AddAsync(userInfo);
                 // save user
                 await _context.SaveChangesAsync();
@@ -91,7 +95,7 @@ namespace ProjectSEM3.Controllers.Auth
                 _config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.Now.AddHours(3),
                 signingCredentials: signatureKey
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -115,11 +119,10 @@ namespace ProjectSEM3.Controllers.Auth
             {
                 claims = claims.Append(new Claim(ClaimTypes.Role, ad.First().Role)).ToArray();
             }
-
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddMinutes(1),
+                Expires = DateTime.Now.AddHours(1),
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -163,19 +166,31 @@ namespace ProjectSEM3.Controllers.Auth
         {
             // xac thuc danh tinh user
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
+            if (identity.IsAuthenticated)
             {
                 var userClaims = identity.Claims;
-                var Id = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-                var user = new UserData
+                var UserId = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+                var user= await _context.Users.Include(e=>e.UserInfos).Where(c => c.Id == Convert.ToInt32(UserId) ).FirstOrDefaultAsync();
+                /*var user = new UserData
                 {
-                    Id = Convert.ToInt32(Id),
+                    Id = Convert.ToInt32(UserId),
                     Email = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value
-                };
+                };*/
                 return Ok(user);
             }
             return Unauthorized();
         }
+
+        [HttpGet, Route("test-profile"),AllowAnonymous]
+        async public Task<IActionResult> GetProfileDemo(int? id)
+        {
+            var user = await _context.Users.Include(e => e.UserInfos).Where(c => c.Id == id).FirstOrDefaultAsync();
+            var UInfo = await _context.UserInfos.Include(e => e.User).Where(e => e.UserId == id).FirstOrDefaultAsync();
+            if (UInfo == null) return NotFound();
+            return Ok(UInfo);
+        }
+
+
         [HttpPost, Route("check-register"), AllowAnonymous]
         async public Task<IActionResult> IsEmailExist(string email)
         {
@@ -204,12 +219,8 @@ namespace ProjectSEM3.Controllers.Auth
         {
 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null) return Unauthorized(new Check { CheckToken=false});
-            return Ok(new Check { CheckToken = true });
-        }
-        class Check
-        {
-            public bool CheckToken { get; set; }
+            if (identity == null) return Unauthorized(new { CheckToken=false});
+            return Ok(new { CheckToken = true });
         }
     }
 }

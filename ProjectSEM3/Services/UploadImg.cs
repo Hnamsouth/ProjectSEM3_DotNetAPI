@@ -1,33 +1,53 @@
 ﻿using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
+using ProjectSEM3.DTOs.Auth;
+using System.Linq;
 
 namespace ProjectSEM3.Services
 {
     public  class UploadImg
     {
-        async static public Task<string> Upload(string? url,string? folder,string? filename)
+        async static public Task<CdnItem> Upload(IFormFile? img,string? folder,string? filename,string? tag)
         {
             Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
             cloudinary.Api.Secure = true;
             var uploadParams = new ImageUploadParams()
             {
-                File = new FileDescription(@"https://upload.wikimedia.org/wikipedia/commons/b/b5/IMG-20190601-WA0004.jpg"),
+                File = new FileDescription(filename, img.OpenReadStream()),
                 UseFilename = true, 
                 UniqueFilename = false, // 
-                Overwrite = true,
-                Folder = "User",  // 
-                PublicId="hoangnam", // ten sp
+                Overwrite = false,
+                Folder = folder,  // 
+                Tags= tag,
+                PublicId = filename, // ten sp
             };
             var uploadResult = await cloudinary.UploadAsync(uploadParams);
-           
             var rs = uploadResult.JsonObj;
-
-           
-
-            return rs.ToString();
+            return rs.ToObject<CdnItem>();
         }
-        
-        async static public Task<String> getImg(string? PublicId)
+
+
+        async static public Task<CdnItem> UploadStr(string url, string? folder, string? filename, string? tag)
+        {
+            Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+            cloudinary.Api.Secure = true;
+            var uploadParams = new ImageUploadParams()
+            {
+                File = new FileDescription(url),
+                UseFilename = true,
+                UniqueFilename = false, // 
+                Overwrite = false,
+                Folder = folder,  // 
+                Tags = tag,
+                PublicId = filename, // ten sp
+            };
+            var uploadResult = await cloudinary.UploadAsync(uploadParams);
+            var rs = uploadResult.JsonObj;
+            return rs.ToObject<CdnItem>();
+        }
+
+
+        async static public Task<Object> getImg(string? folder)
         {
             Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
             /*
@@ -38,7 +58,6 @@ namespace ProjectSEM3.Services
             var listResourcesParams = new ListResourcesParams()
             {
                 Type = "upload",
-                
                 MaxResults = 30
             };
             // get all item with folder
@@ -48,12 +67,22 @@ namespace ProjectSEM3.Services
             var listResourcesByPrefixParams = new ListResourcesByPrefixParams()
             {
                 Type = "upload",
-                Prefix = "User",
-                MaxResults=2
+                Prefix = "Products/sp6",
+                MaxResults=10
             };
             var listResourcesResult = cloudinary.ListResources(listResourcesByPrefixParams);
-            return listResourcesResult.JsonObj.ToString() ;
+            return listResourcesResult.JsonObj.ToObject<Object>();
         }
+
+        async static public Task<string> DeleteImg (string? publicId)
+        {
+            Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+            var rs =  await cloudinary.DeleteResourcesAsync(publicId); 
+
+            return rs.Deleted.Values.ToString();
+        }
+
+
 
         static public string CvImgBase64(IFormFile img)
         {
