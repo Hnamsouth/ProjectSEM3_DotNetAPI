@@ -61,9 +61,8 @@ namespace ProjectSEM3.Controllers
             {
                 var pcl= await _context.ProductColors.FindAsync(data.Id);
                 if(pcl==null) return NotFound();
-
-                var pclUD = new ProductColor { Id = data.Id, Name = data.Name };
-                 _context.ProductColors.Update(pclUD);
+                pcl.Name = data.Name;
+                 _context.ProductColors.Update(pcl);
                 await _context.SaveChangesAsync();
 
                 if(data.Img!=null)
