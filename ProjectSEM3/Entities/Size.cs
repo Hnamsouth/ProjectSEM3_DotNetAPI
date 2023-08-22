@@ -9,7 +9,7 @@ public partial class Size
 
     public string Name { get; set; } = null!;
 
-    public bool Type { get; set; }
+    public bool Type { get; set; } // true: string, false: number
 
     public virtual ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
 }

@@ -1,6 +1,7 @@
 ﻿using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
 using ProjectSEM3.DTOs.Auth;
+using System.Linq;
 
 namespace ProjectSEM3.Services
 {
@@ -24,7 +25,29 @@ namespace ProjectSEM3.Services
             var rs = uploadResult.JsonObj;
             return rs.ToObject<CdnItem>();
         }
-        async static public Task<String> getImg(string? folder)
+
+
+        async static public Task<CdnItem> UploadStr(string url, string? folder, string? filename, string? tag)
+        {
+            Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+            cloudinary.Api.Secure = true;
+            var uploadParams = new ImageUploadParams()
+            {
+                File = new FileDescription(url),
+                UseFilename = true,
+                UniqueFilename = false, // 
+                Overwrite = false,
+                Folder = folder,  // 
+                Tags = tag,
+                PublicId = filename, // ten sp
+            };
+            var uploadResult = await cloudinary.UploadAsync(uploadParams);
+            var rs = uploadResult.JsonObj;
+            return rs.ToObject<CdnItem>();
+        }
+
+
+        async static public Task<Object> getImg(string? folder)
         {
             Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
             /*
@@ -44,12 +67,23 @@ namespace ProjectSEM3.Services
             var listResourcesByPrefixParams = new ListResourcesByPrefixParams()
             {
                 Type = "upload",
-                Prefix = folder,
+                Prefix = "Products/sp6",
                 MaxResults=10
             };
             var listResourcesResult = cloudinary.ListResources(listResourcesByPrefixParams);
-            return listResourcesResult.JsonObj.ToString() ;
+            return listResourcesResult.JsonObj.ToObject<Object>();
         }
+
+        async static public Task<bool> DeleteImg (string? publicId)
+        {
+            Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+            var check = await cloudinary.GetResourceAsync(publicId);
+            if(check.StatusCode == System.Net.HttpStatusCode.NotFound) return false;
+            await cloudinary.DeleteResourcesAsync(publicId);
+            return true;
+        }
+
+
 
         static public string CvImgBase64(IFormFile img)
         {

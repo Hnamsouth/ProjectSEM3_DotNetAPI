@@ -11,9 +11,9 @@ public partial class Cart
 
     public int? UserId { get; set; }
 
-    public int? ProductColorId { get; set; }
+    public int? ProductSizeId { get; set; }
 
-    public virtual ProductColor? ProductColor { get; set; }
+    public virtual ProductSize? ProductSize { get; set; }
 
     public virtual User? User { get; set; }
 }

@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
+using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Helpers;
+using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -30,12 +33,27 @@ namespace ProjectSEM3.Controllers
         [HttpGet]
         public async Task<IActionResult> GetByUserId(int userId)
         {
-            var itemsInCart = await _context.Carts.Where(c => c.UserId == userId).ToListAsync();
-            List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
-            return Ok(list);
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity.IsAuthenticated)
+            {
+                var Id = identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+                var itemsInCart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(Id)).Select(e => new {
+                    Id=e.Id,
+                    buyQty=e.BuyQty,
+                    productSize=e.ProductSize,
+                    product=e.ProductSize.ProductColor.Product
+                }).ToListAsync();
+                //List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
+                return Ok(itemsInCart);
+   
+            }
+            return Unauthorized();
+          
+
         }
 
         [HttpPost]
+        [AllowAnonymous]
         async public Task<IActionResult> Create(CartDto data)
         {
             if (ModelState.IsValid)
