@@ -13,13 +13,13 @@ namespace ProjectSEM3.DTOs
 
         public int? CategoryId { get; set; }
 
-    public string? ColorName { get; set; }
+        public string? ColorName { get; set; }
 
-    public byte Gender { get; set; }
+        public byte Gender { get; set; }
 
-    public string Img { get; set; } = null!;
+        public string Img { get; set; } = null!;
 
-    public DateTime OpenSale { get; set; }
+        public DateTime OpenSale { get; set; }
 
     public byte Status { get; set; }
 

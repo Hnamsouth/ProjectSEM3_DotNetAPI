@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Helpers;
+using System.Security.Claims;
 
 namespace ProjectSEM3.Controllers
 {
@@ -15,33 +16,36 @@ namespace ProjectSEM3.Controllers
         {
             _context = context;
         }
-        [HttpGet,
-        Route ("get")]
-        async public Task<IActionResult> GetAll()
-        {
-            var favouries =await _context.Favouries.ToListAsync();
-            List<FavoriteDto> list = Mapper<Favoury,FavoriteDto>.MapList(favouries);
-            return Ok(list);
-        }
+
         [HttpGet]
-        async public Task<IActionResult> GetByUser(int userId)
+        async public Task<IActionResult> GetByUser()
         {
-            var itemInFavorite =await _context.Favouries.Where(f => f.UserId == userId).ToListAsync();
-            List<FavoriteDto> list = Mapper<Favoury, FavoriteDto>.MapList(itemInFavorite);
-            return Ok(list);
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var Id = identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                var itemInFavorite = await _context.Favouries.Where(f => f.UserId == Convert.ToInt32(Id)).Include(p => p.Product).ToListAsync();
+                List<FavoriteDto> list = Mapper<Favoury, FavoriteDto>.MapList(itemInFavorite);
+                return Ok(list);
+            }
+            return Unauthorized();
+
         }
 
         [HttpPost]
-        async public Task<IActionResult> Create(FavoriteDto data)
+
+        async public Task<IActionResult> Create(int  productId)
         {
-            if (ModelState.IsValid)
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
             {
-                var favourite = Mapper<FavoriteDto, Favoury>.Map(data);
-                await _context.Favouries.AddAsync(favourite);
+                 var UserId = Convert.ToInt32( identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+                await _context.Favouries.AddAsync(new Favoury { UserId = UserId,ProductId = productId });
                 await _context.SaveChangesAsync();
                 return Ok("Created");
             }
-            return BadRequest();
+            return Unauthorized();
         }
         [HttpDelete]
         async public Task<IActionResult> Delete(int id)

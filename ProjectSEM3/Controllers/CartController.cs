@@ -6,12 +6,13 @@ using ProjectSEM3.Entities;
 using ProjectSEM3.Helpers;
 using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProjectSEM3.Controllers
 {
     [Route("api/cart")]
     [ApiController]
+    [Authorize]
     public class CartController:ControllerBase
     {
         private readonly ProjectSem3Context _context;
@@ -35,7 +36,7 @@ namespace ProjectSEM3.Controllers
             if (identity != null)
             {
                 var Id = identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-                var itemsInCart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(Id)).Include(e => e.Product).ToListAsync();
+                var itemsInCart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(Id)).Include(p => p.Product).ToListAsync();
             List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
             return Ok(list);
             }

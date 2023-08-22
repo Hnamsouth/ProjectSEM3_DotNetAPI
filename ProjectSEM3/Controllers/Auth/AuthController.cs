@@ -59,7 +59,7 @@ namespace ProjectSEM3.Controllers.Auth
                 var token = BCrypt.Net.BCrypt.HashString(data.email, 10);
                 var user = new User { Email = data.email, Token = data.email };
                 await _context.Users.AddAsync(user);
-                var userInfo = new UserInfo {  Name = data.family_name + data.given_name};
+                var userInfo = new UserInfo { Name = data.family_name + data.given_name };
                 await _context.UserInfos.AddAsync(userInfo);
                 // save user
                 await _context.SaveChangesAsync();
@@ -96,7 +96,7 @@ namespace ProjectSEM3.Controllers.Auth
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        /*
+
         private string GJWT(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -107,32 +107,59 @@ namespace ProjectSEM3.Controllers.Auth
             var claims = new[]
             {
             new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-            new Claim(ClaimTypes.Name,user.Username),
             new Claim(ClaimTypes.Email,user.Email)
-            };
+        };
 
             var ad = user.Admins;
             if (ad.Any())
             {
                 claims = claims.Append(new Claim(ClaimTypes.Role, ad.First().Role)).ToArray();
             }
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddMinutes(1),
+                Issuer = issuer,
+                Audience = audience,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
+
         [HttpPost, Route("login")]
         [AllowAnonymous]
         async public Task<IActionResult> Login(UserLogin data)
         {
-            var u = await _context.Users.Where(a => a.Username.Equals(data.UserName)).Include(e=>e.Admins).FirstAsync();
-            if (u == null) return NotFound();
+            if (ModelState.IsValid)
+            {
+                // if activate false 
+                var u = await _context.Users.Where(a => a.Email.Equals(data.Email)).Include(e => e.Admins).FirstOrDefaultAsync();
+                if (u == null) return NotFound();
+                var checkPW = BCrypt.Net.BCrypt.Verify(data.Password, u.Password);
+                if (!checkPW) return Unauthorized();
+                return Ok(new UserData { Id = u.Id, Email = u.Email, Token = GJWT(u) });
+            }
+            return BadRequest();
 
-            var checkPW = BCrypt.Net.BCrypt.Verify(data.Password, u.Password);
-            if (!checkPW) return Unauthorized();
-
-
-            return Ok(new UserData { Username = u.Username, Email = u.Email, Token = GenerateJWT(u) });
         }
-        */
-        [HttpGet,Route("profile")]
-        async public Task<IActionResult> getProfile()
+
+        [HttpPost, Route("login-gg"), AllowAnonymous]
+        async public Task<IActionResult> LoginWithGG(GoogleToken data)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _context.Users.Where(u => u.Email.Equals(data.email)).FirstOrDefaultAsync();
+                if (user == null) return NotFound();
+
+                return Ok(new UserData { Id = user.Id, Email = data.email, Token = GJWT(user) });
+            }
+            return BadRequest();
+        }
+        [HttpGet, Route("profile")]
+        async public Task<IActionResult> GetProfile()
         {
             // xac thuc danh tinh user
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -177,13 +204,12 @@ namespace ProjectSEM3.Controllers.Auth
         {
 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null) return Unauthorized(new Check { CheckToken=false});
+            if (identity == null) return Unauthorized(new Check { CheckToken = false });
             return Ok(new Check { CheckToken = true });
         }
         class Check
         {
             public bool CheckToken { get; set; }
         }
-
     }
 }
