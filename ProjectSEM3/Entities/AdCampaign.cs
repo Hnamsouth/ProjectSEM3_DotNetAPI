@@ -9,7 +9,7 @@ public partial class AdCampaign
 
     public string Name { get; set; } = null!;
 
-    public string Img { get; set; } = null!;
+    public string? Img { get; set; } = null!;
 
     public string? Desciption { get; set; }
 
