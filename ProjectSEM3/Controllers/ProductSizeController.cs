@@ -27,7 +27,7 @@ namespace ProjectSEM3.Controllers
         [HttpGet]
         async public Task<IActionResult> Get(int? id)
         {
-            var ps = await _context.ProductSizes.ToListAsync();
+            var ps = await _context.ProductSizes.Include(e => e.Size).ToListAsync();
             if (ps == null) return NotFound();
             if (id != null)
             {
@@ -45,7 +45,7 @@ namespace ProjectSEM3.Controllers
                 var ps = new ProductSize { Qty = data.Qty, SizeId = data.SizeId, ProductColorId = data.ProductColorId };
                 await _context.ProductSizes.AddAsync(ps);
                 await _context.SaveChangesAsync();
-                return Created($"?id={ps.Id}", ps);
+                return Ok(await _context.ProductSizes.Include(e=>e.Size).Where(e=>e.Id==ps.Id).FirstOrDefaultAsync());
 
             }
             return BadRequest();
