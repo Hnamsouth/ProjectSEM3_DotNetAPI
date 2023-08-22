@@ -41,9 +41,10 @@ namespace ProjectSEM3.Controllers
             if (identity != null)
             {
                  var UserId = Convert.ToInt32( identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+                await _context.Favouries.Include(e => e.Product).ThenInclude(e => e.ProductColors).Where(e => e.Id == productId).ToListAsync();
                 await _context.Favouries.AddAsync(new Favoury { UserId = UserId,ProductId = productId });
                 await _context.SaveChangesAsync();
-                return Ok("Created");
+                return Ok();
             }
             return Unauthorized();
         }
