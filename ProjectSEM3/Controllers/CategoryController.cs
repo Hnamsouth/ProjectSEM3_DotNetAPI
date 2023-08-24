@@ -36,6 +36,21 @@ namespace ProjectSEM3.Controllers
             return Ok(category);
         }
 
+        [HttpGet]
+        async public Task<IActionResult> GetBy(int? id)
+        {
+            if (id == null)
+            {
+                var categories = await _context.Categories.Include(e => e.CategoryDetails).ToListAsync();
+                return Ok(categories);
+            }
+            var category = await _context.Categories.Include(e => e.CategoryDetails).Where(e => e.Id.Equals(id)).FirstOrDefaultAsync();
+
+            if (category == null) { return NotFound(); }
+            return Ok(category);
+        }
+
+
         // POST api/<CategoryController>
         [HttpPost,Route("create")]
         async public Task<IActionResult> Create(CategoryDto data)
