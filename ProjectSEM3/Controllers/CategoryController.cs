@@ -36,7 +36,7 @@ namespace ProjectSEM3.Controllers
             return Ok(category);
         }
 
-        [HttpGet]
+        [HttpGet,Route("get-by-type")]
         async public Task<IActionResult> GetBy(int? id)
         {
             if (id == null)

@@ -76,11 +76,19 @@ namespace ProjectSEM3.Services
 
         async static public Task<bool> DeleteImg (string? publicId)
         {
-            Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
-            var check = await cloudinary.GetResourceAsync(publicId);
-            if(check.StatusCode == System.Net.HttpStatusCode.NotFound) return false;
-            await cloudinary.DeleteResourcesAsync(publicId);
-            return true;
+            try
+            {
+                Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+                var check = await cloudinary.GetResourceAsync(publicId);
+                if (check.StatusCode == System.Net.HttpStatusCode.NotFound) return false;
+                await cloudinary.DeleteResourcesAsync(ResourceType.Image, publicId);
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+            
         }
 
 

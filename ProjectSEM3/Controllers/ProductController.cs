@@ -33,18 +33,44 @@ namespace ProjectSEM3.Controllers
             if (id == null)
             {
                 var products = await _context.Products.
-                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
-                Include(e => e.Kindofsport).
-                Include(e => e.ProductColors).ThenInclude(c => c.ProductColorImages).
-                Include(e => e.ProductColors).ThenInclude(i => i.ProductSizes).
+                Select(e => new
+                {
+                    e.Id,e.Name,e.Price,e.Description,e.Gender,e.OpenSale,e.Status,
+                    categoryDetail = new
+                    {
+                        e.CategoryDetail.Id,e.CategoryDetail.Name,e.CategoryDetail.Category
+                    },
+                    e.Kindofsport,
+                    productColors = e.ProductColors.Select(a => new
+                    {
+                        a.Id,a.Name, a.ProductId,a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new
+                        {
+                            s.Id,s.Qty,s.SizeId,s.ProductColorId,s.Size
+                        })
+                    }),
+                }).
                 ToListAsync();
                 return Ok(products);
             }
             var product = await _context.Products.
-                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
-                Include(e => e.Kindofsport).
-                Include(e => e.ProductColors).ThenInclude(i => i.ProductColorImages).
-                Include(e => e.ProductColors).ThenInclude(i => i.ProductSizes).
+                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).Select(e => new
+                {
+                    e.Id,e.Name,e.Price,e.Description,e.Gender,e.OpenSale,e.Status,
+                    categoryDetail = new
+                    {
+                        e.CategoryDetail.Id,e.CategoryDetail.Name,e.CategoryDetail.Category
+                    },
+                    e.Kindofsport,
+                    productColors = e.ProductColors.Select(a => new
+                    {
+                        a.Id,a.Name, a.ProductId,a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new
+                        {
+                            s.Id,s.Qty,s.SizeId,s.ProductColorId,s.Size
+                        })
+                    }),
+                }).
                 Where(e=>e.Id == id).FirstOrDefaultAsync();
             if (product == null) { return NotFound(); }
             return Ok(product);
@@ -124,6 +150,69 @@ namespace ProjectSEM3.Controllers
                 await _context.SaveChangesAsync();
             }
             return NotFound();
+        }
+
+
+        [HttpGet,Route("nav-data")]
+        async public Task<IActionResult> NavData()
+        {
+            var c_male =  _context.Products.Where(e=>e.Gender==0).Select(e => e.CategoryDetailId);
+            var c_female =  _context.Products.Where(e=>e.Gender==1).Select(e => e.CategoryDetailId);
+            var c_kid =  _context.Products.Where(e=>e.Gender==2).Select(e => e.CategoryDetailId);
+
+            var data_male = _context.Categories.Select(e => new
+            {
+                e.Id,
+                e.Name,
+                CategoryDetails = e.CategoryDetails.Where(a=> c_male.Contains(a.Id)),
+                gender=0
+            });
+            var data_female = _context.Categories.Select(e => new
+            {
+                e.Id,
+                e.Name,
+                CategoryDetails = e.CategoryDetails.Where(a=> c_female.Contains(a.Id)),
+                gender = 1
+            });
+            var data_kid = _context.Categories.Select(e => new
+            {
+                e.Id,
+                e.Name,
+                CategoryDetails = e.CategoryDetails.Where(a=> c_kid.Contains(a.Id)),
+                gender = 2
+            });
+
+            var  data =new object[] { data_female, data_male, data_kid };
+
+            return Ok(data);
+        }
+
+        [HttpGet,Route("search-by")]
+        async public Task<IActionResult> SearchBy([FromQuery] int gender, [FromQuery] int categoryDetailId)
+        {
+            var product = await _context.Products.
+                Where(e => e.Gender==gender && e.CategoryDetailId==categoryDetailId).
+                Select(e => new
+                {
+                    e.Id,e.Name,e.Price,e.Description,e.Gender,e.OpenSale,e.Status,
+                    categoryDetail = new
+                    {
+                        e.CategoryDetail.Id,e.CategoryDetail.Name,e.CategoryDetail.Category
+                    },
+                    e.Kindofsport,
+                    productColors = e.ProductColors.Select(a => new
+                    {
+                        a.Id,a.Name,a.ProductId,a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new
+                        {
+                            s.Id,s.Qty,s.SizeId,s.ProductColorId,s.Size
+                        })
+                    }),
+
+                }).
+                ToListAsync();
+            if (product == null) return NotFound();
+            return Ok(product);
         }
     }
 }

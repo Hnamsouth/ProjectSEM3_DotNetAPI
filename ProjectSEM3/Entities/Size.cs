@@ -11,5 +11,5 @@ public partial class Size
 
     public bool Type { get; set; } // true: string, false: number
 
-    public virtual ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
+    public virtual ICollection<ProductSize>? ProductSizes { get; set; } = new List<ProductSize>();
 }
