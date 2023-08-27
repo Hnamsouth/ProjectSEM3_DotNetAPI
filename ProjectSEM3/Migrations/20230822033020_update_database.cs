@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectSEM3.Migrations
 {
     /// <inheritdoc />
-    public partial class create_database : Migration
+    public partial class update_database : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -90,7 +90,7 @@ namespace ProjectSEM3.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "varchar(10)", unicode: false, maxLength: 10, nullable: false),
-                    SizeType = table.Column<byte>(type: "tinyint", nullable: false)
+                    Type = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -295,10 +295,7 @@ namespace ProjectSEM3.Migrations
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(12,4)", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    category_id = table.Column<int>(type: "int", nullable: true),
-                    ColorName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gender = table.Column<byte>(type: "tinyint", nullable: false, defaultValueSql: "(CONVERT([tinyint],(0)))"),
-                    Img = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "(N'')"),
                     OpenSale = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())"),
                     Status = table.Column<byte>(type: "tinyint", nullable: false, defaultValueSql: "(CONVERT([tinyint],(0)))"),
                     category_detail_id = table.Column<int>(type: "int", nullable: true),
@@ -307,11 +304,6 @@ namespace ProjectSEM3.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Products__3214EC0726D18407", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK__Products__catego__2DE6D218",
-                        column: x => x.category_id,
-                        principalTable: "Categories",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK__Products__catego__41EDCAC5",
                         column: x => x.category_detail_id,
@@ -449,6 +441,25 @@ namespace ProjectSEM3.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductColor",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
+                    product_id = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Prod_color", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK__ProductCo__produ__00200768",
+                        column: x => x.product_id,
+                        principalTable: "Products",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductForChild",
                 columns: table => new
                 {
@@ -496,6 +507,28 @@ namespace ProjectSEM3.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductColorImage",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Url = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
+                    publicId = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
+                    Folder = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
+                    asset_id = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
+                    product_color_id = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__ProductC__3214EC0744F31D6A", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK__ProductCo__produ__0D7A0286",
+                        column: x => x.product_color_id,
+                        principalTable: "ProductColor",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductSize",
                 columns: table => new
                 {
@@ -503,15 +536,15 @@ namespace ProjectSEM3.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Qty = table.Column<int>(type: "int", nullable: false),
                     SizeId = table.Column<int>(type: "int", nullable: true),
-                    product_id = table.Column<int>(type: "int", nullable: false)
+                    product_color_id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__ProductS__3214EC07D29ABF3C", x => x.Id);
                     table.ForeignKey(
-                        name: "FK__ProductSi__produ__3A4CA8FD",
-                        column: x => x.product_id,
-                        principalTable: "Products",
+                        name: "FK__ProductSi__produ__04E4BC85",
+                        column: x => x.product_color_id,
+                        principalTable: "ProductColor",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK__ProductSi__size___2FCF1A8A",
@@ -527,22 +560,16 @@ namespace ProjectSEM3.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     buy_qty = table.Column<int>(type: "int", nullable: false),
-                    product_id = table.Column<int>(type: "int", nullable: true),
-                    productSize_id = table.Column<int>(type: "int", nullable: true),
-                    user_id = table.Column<int>(type: "int", nullable: true)
+                    user_id = table.Column<int>(type: "int", nullable: true),
+                    product_size_id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Carts__3214EC07A226B5B5", x => x.Id);
                     table.ForeignKey(
-                        name: "FK__Carts__productSi__1CBC4616",
-                        column: x => x.productSize_id,
+                        name: "FK__Carts__product_s__09A971A2",
+                        column: x => x.product_size_id,
                         principalTable: "ProductSize",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK__Carts__product_i__1AD3FDA4",
-                        column: x => x.product_id,
-                        principalTable: "Products",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK__Carts__user_id__1DB06A4F",
@@ -558,9 +585,8 @@ namespace ProjectSEM3.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Qty = table.Column<int>(type: "int", nullable: false),
-                    product_id = table.Column<int>(type: "int", nullable: true),
-                    productSize_id = table.Column<int>(type: "int", nullable: true),
-                    order_id = table.Column<int>(type: "int", nullable: true)
+                    order_id = table.Column<int>(type: "int", nullable: true),
+                    product_size_id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -571,13 +597,8 @@ namespace ProjectSEM3.Migrations
                         principalTable: "Orders",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK__OrderDeta__produ__2645B050",
-                        column: x => x.product_id,
-                        principalTable: "Products",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK__OrderDeta__produ__2739D489",
-                        column: x => x.productSize_id,
+                        name: "FK__OrderDeta__produ__0A9D95DB",
+                        column: x => x.product_size_id,
                         principalTable: "ProductSize",
                         principalColumn: "Id");
                 });
@@ -598,20 +619,9 @@ namespace ProjectSEM3.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "UQ__Admins__DA15413E248224BD",
-                table: "Admins",
-                column: "Role",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Carts_product_id",
+                name: "IX_Carts_product_size_id",
                 table: "Carts",
-                column: "product_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Carts_productSize_id",
-                table: "Carts",
-                column: "productSize_id");
+                column: "product_size_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Carts_user_id",
@@ -619,21 +629,9 @@ namespace ProjectSEM3.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "UQ__Categori__737584F60CB46E23",
-                table: "Categories",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CategoryDetail_category_id",
                 table: "CategoryDetail",
                 column: "category_id");
-
-            migrationBuilder.CreateIndex(
-                name: "UQ__Category__737584F67976B658",
-                table: "CategoryDetail",
-                column: "Name",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_DiscountProduct_Discount_id",
@@ -656,12 +654,6 @@ namespace ProjectSEM3.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "UQ__KindOfSp__737584F6CDD7C52D",
-                table: "KindOfSport",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_News_Admin_id",
                 table: "News",
                 column: "Admin_id");
@@ -672,14 +664,9 @@ namespace ProjectSEM3.Migrations
                 column: "order_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetail_product_id",
+                name: "IX_OrderDetail_product_size_id",
                 table: "OrderDetail",
-                column: "product_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderDetail_productSize_id",
-                table: "OrderDetail",
-                column: "productSize_id");
+                column: "product_size_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_user_id",
@@ -712,6 +699,16 @@ namespace ProjectSEM3.Migrations
                 column: "product_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductColor_product_id",
+                table: "ProductColor",
+                column: "product_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductColorImage_product_color_id",
+                table: "ProductColorImage",
+                column: "product_color_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductForChild_product_id",
                 table: "ProductForChild",
                 column: "product_id");
@@ -732,30 +729,19 @@ namespace ProjectSEM3.Migrations
                 column: "category_detail_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_category_id",
-                table: "Products",
-                column: "category_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Products_kindofsport_id",
                 table: "Products",
                 column: "kindofsport_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductSize_product_id",
+                name: "IX_ProductSize_product_color_id",
                 table: "ProductSize",
-                column: "product_id");
+                column: "product_color_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductSize_SizeId",
                 table: "ProductSize",
                 column: "SizeId");
-
-            migrationBuilder.CreateIndex(
-                name: "UQ__Size__737584F6F8BC285F",
-                table: "Size",
-                column: "Name",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserCard_user_id",
@@ -768,7 +754,7 @@ namespace ProjectSEM3.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "UQ__Users__A9D10534B7ED3B19",
+                name: "UQ__Users__A9D105343F77BE89",
                 table: "Users",
                 column: "Email",
                 unique: true);
@@ -802,6 +788,9 @@ namespace ProjectSEM3.Migrations
                 name: "ProductAdCampaign");
 
             migrationBuilder.DropTable(
+                name: "ProductColorImage");
+
+            migrationBuilder.DropTable(
                 name: "ProductForChild");
 
             migrationBuilder.DropTable(
@@ -832,7 +821,7 @@ namespace ProjectSEM3.Migrations
                 name: "AdCampaign");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "ProductColor");
 
             migrationBuilder.DropTable(
                 name: "Size");
@@ -845,6 +834,9 @@ namespace ProjectSEM3.Migrations
 
             migrationBuilder.DropTable(
                 name: "Partners");
+
+            migrationBuilder.DropTable(
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "CategoryDetail");

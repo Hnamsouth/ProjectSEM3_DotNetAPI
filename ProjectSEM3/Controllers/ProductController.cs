@@ -33,22 +33,78 @@ namespace ProjectSEM3.Controllers
             if (id == null)
             {
                 var products = await _context.Products.
-                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
-                Include(e => e.Kindofsport).
-                Include(e => e.ProductColors).ThenInclude(c => c.ProductColorImages).
-                Include(e => e.ProductColors).ThenInclude(i => i.ProductSizes).
+                Select(e => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.Price,
+                    e.Description,
+                    e.Gender,
+                    e.OpenSale,
+                    e.Status,
+                    categoryDetail = new
+                    {
+                        e.CategoryDetail.Name,
+                        e.CategoryDetail.Category
+                    },
+                    e.Kindofsport,
+                    productColors = e.ProductColors.Select(a => new
+                    {
+                        a.Id,
+                        a.Name,
+                        a.ProductId,
+                        a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new
+                        {
+                            s.Id,
+                            s.Qty,
+                            s.SizeId,
+                            s.ProductColorId,
+                            s.Size
+                        })
+                    }),
+                }).
                 ToListAsync();
                 return Ok(products);
             }
             var product = await _context.Products.
-                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
-                Include(e => e.Kindofsport).
-                Include(e => e.ProductColors).ThenInclude(i => i.ProductColorImages).
-                Include(e => e.ProductColors).ThenInclude(i => i.ProductSizes).
-                Where(e=>e.Id == id).FirstOrDefaultAsync();
+                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).Select(e => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.Price,
+                    e.Description,
+                    e.Gender,
+                    e.OpenSale,
+                    e.Status,
+                    categoryDetail = new
+                    {
+                        e.CategoryDetail.Name,
+                        e.CategoryDetail.Category
+                    },
+                    e.Kindofsport,
+                    productColors = e.ProductColors.Select(a => new
+                    {
+                        a.Id,
+                        a.Name,
+                        a.ProductId,
+                        a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new
+                        {
+                            s.Id,
+                            s.Qty,
+                            s.SizeId,
+                            s.ProductColorId,
+                            s.Size
+                        })
+                    }),
+                }).
+                Where(e => e.Id == id).FirstOrDefaultAsync();
             if (product == null) { return NotFound(); }
             return Ok(product);
         }
+
+
 
         // POST api/<CategoryController>
         [HttpPost]

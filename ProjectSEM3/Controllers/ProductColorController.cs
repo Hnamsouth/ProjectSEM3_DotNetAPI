@@ -25,14 +25,13 @@ namespace ProjectSEM3.Controllers
         {
             if (id == null)
             {
-                var pcls = await _context.ProductColors.Include(e=>e.ProductColorImages).ToListAsync();
+                var pcls = await _context.ProductColors.Include(e => e.ProductColorImages).Include(e => e.ProductSizes).ThenInclude(e => e.Size).ToListAsync();
                 return Ok(pcls);
             }
-            var pcl= await _context.ProductColors.Include(e => e.ProductColorImages).Where(c=>c.ProductId == id).ToListAsync();
-            if(pcl==null) return NotFound();
+            var pcl = await _context.ProductColors.Include(e => e.ProductColorImages).Include(e => e.ProductSizes).ThenInclude(e => e.Size).Where(c => c.ProductId == id).ToListAsync();
+            if (pcl == null) return NotFound();
             return Ok(pcl);
         }
-
         [HttpPost]
         async public Task<IActionResult> Create(ProductColorCreate data)
         {
