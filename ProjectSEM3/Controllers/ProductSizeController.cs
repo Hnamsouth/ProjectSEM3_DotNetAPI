@@ -24,14 +24,14 @@ namespace ProjectSEM3.Controllers
             _context = context;
         }
 
-        [HttpGet, Route("get")]
+        [HttpGet]
         async public Task<IActionResult> Get(int? id)
         {
             var ps = await _context.ProductSizes.ToListAsync();
             if (ps == null) return NotFound();
             if (id != null)
             {
-                var pss = await _context.ProductSizes.FindAsync(id);
+                var pss = await _context.ProductSizes.Include(e=>e.Size).Where(e=>e.ProductColorId==id).ToListAsync();
                 return Ok(pss);
             }
             return Ok(ps);
@@ -42,9 +42,10 @@ namespace ProjectSEM3.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.ProductSizes.Add(new ProductSize { Qty = data.Qty, SizeId = data.SizeId,ProductId= data.ProductId});
+                var ps = new ProductSize { Qty = data.Qty, SizeId = data.SizeId, ProductColorId = data.ProductColorId };
+                await _context.ProductSizes.AddAsync(ps);
                 await _context.SaveChangesAsync();
-                return Created($"/get?id={data.Id}", data);
+                return Created($"?id={ps.Id}", ps);
 
             }
             return BadRequest();

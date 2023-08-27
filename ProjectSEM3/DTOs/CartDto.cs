@@ -8,8 +8,6 @@ namespace ProjectSEM3.DTOs
 
         public int BuyQty { get; set; }
 
-        public int? ProductId { get; set; }
-
         public int? ProductSizeId { get; set; }
 
         public int? UserId { get; set; }

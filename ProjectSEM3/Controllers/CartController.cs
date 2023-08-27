@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
 using ProjectSEM3.DTOs.Auth;
@@ -12,7 +14,7 @@ namespace ProjectSEM3.Controllers
 {
     [Route("api/cart")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy ="Auth")]
     public class CartController:ControllerBase
     {
         private readonly ProjectSem3Context _context;
@@ -20,8 +22,7 @@ namespace ProjectSEM3.Controllers
         {
             _context = context;
         }
-        //[HttpGet,
-        // Route("get")]
+        //[HttpGet, Route("get")]
         //async public Task<IActionResult> GetAll()
         //{
         //    var itemsInCart = await _context.Carts.ToListAsync();
@@ -30,20 +31,15 @@ namespace ProjectSEM3.Controllers
         //}
 
         [HttpGet]
-        public async Task<IActionResult> GetByUserId()
+        public async Task<IActionResult> GetByUserId(int userId)
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
-            {
-                var Id = identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-                var itemsInCart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(Id)).Include(p => p.Product).ToListAsync();
+            var itemsInCart = await _context.Carts.Where(c => c.UserId == userId).ToListAsync();
             List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
             return Ok(list);
-            }
-            return Unauthorized();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         async public Task<IActionResult> Create(CartDto data)
         {
             if (ModelState.IsValid)

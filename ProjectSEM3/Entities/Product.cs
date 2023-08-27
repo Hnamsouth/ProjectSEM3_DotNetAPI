@@ -13,13 +13,7 @@ public partial class Product
 
     public string? Description { get; set; }
 
-    public int? CategoryId { get; set; }
-
-    public string? ColorName { get; set; }
-
     public byte Gender { get; set; }
-
-    public string Img { get; set; } = null!;
 
     public DateTime OpenSale { get; set; }
 
@@ -29,10 +23,6 @@ public partial class Product
 
     public int? KindofsportId { get; set; }
 
-    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
-
-    public virtual Category? Category { get; set; }
-
     public virtual CategoryDetail? CategoryDetail { get; set; }
 
     public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
@@ -41,11 +31,9 @@ public partial class Product
 
     public virtual KindOfSport? Kindofsport { get; set; }
 
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual ICollection<ProductColor> ProductColors { get; set; } = new List<ProductColor>();
 
     public virtual ICollection<ProductForChild> ProductForChildren { get; set; } = new List<ProductForChild>();
 
     public virtual ICollection<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
-
-    public virtual ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
@@ -10,7 +11,7 @@ using ProjectSEM3.Entities;
 
 namespace ProjectSEM3.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/category-detail")]
     [ApiController]
     public class CategoryDetailController : ControllerBase
     {
@@ -27,10 +28,10 @@ namespace ProjectSEM3.Controllers
         {
             if (id == null)
             {
-                var cds = await _context.CategoryDetails.ToListAsync();
+                var cds = await _context.CategoryDetails.Include(e => e.Category).ToListAsync();
                 return Ok(cds);
             }
-            var cd = await _context.CategoryDetails.FindAsync(id);
+            var cd = await _context.CategoryDetails.Include(e=>e.Category).Where(c=>c.Id.Equals(id)).FirstOrDefaultAsync();
 
             if (cd == null) { return NotFound(); }
             return Ok(cd);
@@ -42,9 +43,10 @@ namespace ProjectSEM3.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.CategoryDetails.Add(new CategoryDetail { Name = data.Name, CategoryId = data.CategoryId });
+                var c = new CategoryDetail { Name = data.Name, CategoryId = data.CategoryId };
+                await _context.CategoryDetails.AddAsync(c);
                 await _context.SaveChangesAsync();
-                return Created($"/get?id={data.Id}", data);
+                return Ok(await _context.CategoryDetails.Include(e => e.Category).Where(d => d.Id.Equals(c.Id)).FirstOrDefaultAsync());
             }
             return BadRequest();
         }
