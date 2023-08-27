@@ -49,8 +49,7 @@ namespace ProjectSEM3.Controllers
                             s.Id,s.Qty,s.SizeId,s.ProductColorId,s.Size
                         })
                     }),
-                }).
-                ToListAsync();
+                }).Where(e => e.Status == 0).ToListAsync();
                 return Ok(products);
             }
             var product = await _context.Products.
@@ -71,7 +70,7 @@ namespace ProjectSEM3.Controllers
                         })
                     }),
                 }).
-                Where(e=>e.Id == id).FirstOrDefaultAsync();
+                Where(e=>e.Id == id && e.Status == 0).FirstOrDefaultAsync();
             if (product == null) { return NotFound(); }
             return Ok(product);
         }
@@ -164,25 +163,25 @@ namespace ProjectSEM3.Controllers
             {
                 e.Id,
                 e.Name,
-                CategoryDetails = e.CategoryDetails.Where(a=> c_male.Contains(a.Id)),
-                gender=0
+                data = e.CategoryDetails.Where(a=> c_male.Contains(a.Id)),
             });
             var data_female = _context.Categories.Select(e => new
             {
                 e.Id,
                 e.Name,
-                CategoryDetails = e.CategoryDetails.Where(a=> c_female.Contains(a.Id)),
-                gender = 1
+                data = e.CategoryDetails.Where(a=> c_female.Contains(a.Id)),
             });
             var data_kid = _context.Categories.Select(e => new
             {
                 e.Id,
                 e.Name,
-                CategoryDetails = e.CategoryDetails.Where(a=> c_kid.Contains(a.Id)),
-                gender = 2
+                data = e.CategoryDetails.Where(a=> c_kid.Contains(a.Id)),
             });
 
-            var  data =new object[] { data_female, data_male, data_kid };
+            var  data =new object[] { 
+                new {Title="WOMEN",data= data_female },
+                new {Title="MAN",data= data_male }, 
+                new {Title="KID",data= data_kid } };
 
             return Ok(data);
         }
