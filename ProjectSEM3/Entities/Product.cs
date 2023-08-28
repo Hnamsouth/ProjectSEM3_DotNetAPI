@@ -13,17 +13,27 @@ public partial class Product
 
     public string? Description { get; set; }
 
-    public int? CategoryId { get; set; }
+    public byte Gender { get; set; }
 
-    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+    public DateTime OpenSale { get; set; }
 
-    public virtual Category? Category { get; set; }
+    public byte Status { get; set; }
+
+    public int? CategoryDetailId { get; set; }
+
+    public int? KindofsportId { get; set; }
+
+    public virtual CategoryDetail? CategoryDetail { get; set; }
+
+    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
 
     public virtual ICollection<Favoury> Favouries { get; set; } = new List<Favoury>();
 
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual KindOfSport? Kindofsport { get; set; }
 
     public virtual ICollection<ProductColor> ProductColors { get; set; } = new List<ProductColor>();
+
+    public virtual ICollection<ProductForChild> ProductForChildren { get; set; } = new List<ProductForChild>();
 
     public virtual ICollection<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
 }

@@ -1,126 +1,439 @@
-﻿USE Project_SEM3
+﻿
+/****** Object:  Table [dbo].[Admins]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
 GO
-
-CREATE TABLE Categories (
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Name nvarchar(255) not null unique
-)
+SET QUOTED_IDENTIFIER ON
 GO
-
-CREATE TABLE Products (
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Name nvarchar(255) not null ,
-	Price decimal(12,4) not null,
-	Description text ,
-	category_id int FOREIGN KEY REFERENCES Categories(Id)
-)
-
-GO 
-CREATE TABLE ProductColor (
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Img varchar(255) NOT NULL,
-	ColorName varchar(100),
-	product_id int FOREIGN KEY REFERENCES Products(Id)
-)
-GO 
-
-CREATE TABLE Size(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Name varchar(10) NOT NULL UNIQUE
-)
+CREATE TABLE [dbo].[Admins](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Role] [varchar](100) NOT NULL,
+	[user_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Role] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-CREATE TABLE ProductSize (
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Qty int NOT NULL DEFAULT(0),
-	size_id int FOREIGN KEY REFERENCES Size(Id),
-	productColor_id int FOREIGN KEY REFERENCES ProductColor(Id)
-)
-GO 
-CREATE TABLE Users(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Username varchar(100) NOT NULL UNIQUE,
-	Email varchar(255) NOT NULL UNIQUE,
-	Password text NOT NULL 
-)
-
+/****** Object:  Table [dbo].[Carts]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
 GO
-CREATE TABLE UserInfo(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Name varchar(255) NOT NULL,
-	Phone varchar(20) ,
-	Address nvarchar(255),
-	Birthday Date,
-	Country varchar(100),
-	Gender bit DEFAULT(0),
-	user_id int FOREIGN KEY REFERENCES Users(Id)
-)
-
-GO 
-CREATE TABLE Admins(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Role varchar(100) NOT NULL UNIQUE,
-	user_id int FOREIGN KEY REFERENCES Users(Id)
-);
+SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE Carts(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	buy_qty int NOT NULL,
-	productColor_id int FOREIGN KEY REFERENCES ProductColor(Id),
-	product_id int FOREIGN KEY REFERENCES Products(Id),
-	productSize_id int FOREIGN KEY REFERENCES ProductSize(Id),
-	user_id int FOREIGN KEY REFERENCES Users(Id)
-)
-
-GO 
-CREATE TABLE Favouries(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	productColor_id int FOREIGN KEY REFERENCES ProductColor(Id),
-	product_id int FOREIGN KEY REFERENCES Products(Id),
-	user_id int FOREIGN KEY REFERENCES Users(Id)
-);
-GO 
-CREATE TABLE Orders(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Date date NOT NULL DEFAULT(GETDATE()),
-	Status tinyint NOT NULL,
-	Ship_Code varchar(255),
-	user_id int FOREIGN KEY REFERENCES Users(Id)
-);
+CREATE TABLE [dbo].[Carts](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[buy_qty] [int] NOT NULL,
+	[productColor_id] [int] NULL,
+	[product_id] [int] NULL,
+	[productSize_id] [int] NULL,
+	[user_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-CREATE TABLE OrderDetail(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Qty int NOT NULL,
-	productColor_id int FOREIGN KEY REFERENCES ProductColor(Id),
-	product_id int FOREIGN KEY REFERENCES Products(Id),
-	productSize_id int FOREIGN KEY REFERENCES ProductSize(Id),
-	order_id int FOREIGN KEY REFERENCES Orders(Id)
-);
+/****** Object:  Table [dbo].[Categories]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
 GO
-CREATE TABLE Payment(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Name nvarchar(255) NOT NULL,
-	Address nvarchar(255) NOT NULL,
-	PostalCode int NOT NULL,
-	Email varchar(255) NOT NULL,
-	Phone varchar(20) NOT NULL,
-
-	order_id int FOREIGN KEY REFERENCES Orders(Id),
-	user_id int FOREIGN KEY REFERENCES Users(Id)
-);
+SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE UserCard(
-	CardNumber int PRIMARY KEY NOT NULL,
-	NameOnCard varchar(255) NOT NULL,
-	ExpiryDate varchar(5) NOT NULL,
-	CVC tinyint NOT NULL,
-	user_id int FOREIGN KEY REFERENCES Users(Id)
-)
+CREATE TABLE [dbo].[Categories](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Name] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-CREATE TABLE ProductReview(
-	Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	Comment text,
-	Rate int NOT NULL,
-	product_id int FOREIGN KEY REFERENCES Products(Id),
-	user_id int FOREIGN KEY REFERENCES Users(Id),
-	created_at datetime NOT NULL DEFAULT(GETDATE())
-);
+/****** Object:  Table [dbo].[Discount]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Discount](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Coupon] [nvarchar](50) NOT NULL,
+	[Description] [nvarchar](255) NOT NULL,
+	[DiscountPercent] [decimal](3, 1) NOT NULL,
+	[Thumbnail] [nvarchar](255) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[DiscountProduct]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DiscountProduct](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Product_id] [int] NULL,
+	[Discount_id] [int] NULL,
+	[StartDate] [datetime] NOT NULL,
+	[EndDate] [datetime] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Favouries]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Favouries](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[productColor_id] [int] NULL,
+	[product_id] [int] NULL,
+	[user_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[News]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[News](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Title] [nvarchar](255) NOT NULL,
+	[ShortDescription] [nvarchar](255) NOT NULL,
+	[Thumbnail] [nvarchar](255) NOT NULL,
+	[Content] [text] NOT NULL,
+	[Created_at] [datetime] NULL,
+	[Update_at] [datetime] NULL,
+	[Admin_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[OrderDetail]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[OrderDetail](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Qty] [int] NOT NULL,
+	[productColor_id] [int] NULL,
+	[product_id] [int] NULL,
+	[productSize_id] [int] NULL,
+	[order_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Orders]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Orders](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Date] [date] NOT NULL,
+	[Status] [tinyint] NOT NULL,
+	[Ship_Code] [varchar](255) NULL,
+	[user_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Payment]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Payment](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NOT NULL,
+	[Address] [nvarchar](255) NOT NULL,
+	[PostalCode] [int] NOT NULL,
+	[Email] [varchar](255) NOT NULL,
+	[Phone] [varchar](20) NOT NULL,
+	[order_id] [int] NULL,
+	[user_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ProductColor]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ProductColor](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Img] [varchar](255) NOT NULL,
+	[ColorName] [varchar](100) NULL,
+	[product_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ProductReview]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ProductReview](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Comment] [text] NULL,
+	[Rate] [int] NOT NULL,
+	[product_id] [int] NULL,
+	[user_id] [int] NULL,
+	[created_at] [datetime] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Products]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Products](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NOT NULL,
+	[Price] [decimal](12, 4) NOT NULL,
+	[Description] [text] NULL,
+	[category_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ProductSize]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ProductSize](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Qty] [int] NOT NULL,
+	[size_id] [int] NULL,
+	[productColor_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Size]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Size](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](10) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Name] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[UserCard]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[UserCard](
+	[CardNumber] [int] NOT NULL,
+	[NameOnCard] [varchar](255) NOT NULL,
+	[ExpiryDate] [varchar](5) NOT NULL,
+	[CVC] [tinyint] NOT NULL,
+	[user_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[CardNumber] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[UserInfo]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[UserInfo](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](255) NOT NULL,
+	[Phone] [varchar](20) NULL,
+	[Address] [nvarchar](255) NULL,
+	[Birthday] [date] NULL,
+	[Country] [varchar](100) NULL,
+	[Gender] [bit] NULL,
+	[user_id] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Users](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Username] [varchar](100) NOT NULL,
+	[Email] [varchar](255) NOT NULL,
+	[Password] [text] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Username] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Email] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Voucher]    Script Date: 7/21/2023 2:25:31 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Voucher](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Coupon] [nvarchar](50) NOT NULL,
+	[Description] [nvarchar](255) NOT NULL,
+	[DiscountPercent] [decimal](3, 1) NULL,
+	[DiscountFlat] [decimal](12, 4) NULL,
+	[Thumbnail] [nvarchar](255) NOT NULL,
+	[StartDate] [datetime] NULL,
+	[EndDate] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[DiscountProduct] ADD  DEFAULT (getdate()) FOR [StartDate]
+GO
+ALTER TABLE [dbo].[News] ADD  DEFAULT (getdate()) FOR [Created_at]
+GO
+ALTER TABLE [dbo].[Orders] ADD  DEFAULT (getdate()) FOR [Date]
+GO
+ALTER TABLE [dbo].[ProductReview] ADD  DEFAULT (getdate()) FOR [created_at]
+GO
+ALTER TABLE [dbo].[ProductSize] ADD  DEFAULT ((0)) FOR [Qty]
+GO
+ALTER TABLE [dbo].[UserInfo] ADD  DEFAULT ((0)) FOR [Gender]
+GO
+ALTER TABLE [dbo].[Voucher] ADD  DEFAULT (getdate()) FOR [StartDate]
+GO
+ALTER TABLE [dbo].[Admins]  WITH CHECK ADD FOREIGN KEY([user_id])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[Carts]  WITH CHECK ADD FOREIGN KEY([product_id])
+REFERENCES [dbo].[Products] ([Id])
+GO
+ALTER TABLE [dbo].[Carts]  WITH CHECK ADD FOREIGN KEY([productColor_id])
+REFERENCES [dbo].[ProductColor] ([Id])
+GO
+ALTER TABLE [dbo].[Carts]  WITH CHECK ADD FOREIGN KEY([productSize_id])
+REFERENCES [dbo].[ProductSize] ([Id])
+GO
+ALTER TABLE [dbo].[Carts]  WITH CHECK ADD FOREIGN KEY([user_id])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[DiscountProduct]  WITH CHECK ADD FOREIGN KEY([Discount_id])
+REFERENCES [dbo].[Discount] ([Id])
+GO
+ALTER TABLE [dbo].[DiscountProduct]  WITH CHECK ADD FOREIGN KEY([Product_id])
+REFERENCES [dbo].[Products] ([Id])
+GO
+ALTER TABLE [dbo].[Favouries]  WITH CHECK ADD FOREIGN KEY([productColor_id])
+REFERENCES [dbo].[ProductColor] ([Id])
+GO
+ALTER TABLE [dbo].[Favouries]  WITH CHECK ADD FOREIGN KEY([product_id])
+REFERENCES [dbo].[Products] ([Id])
+GO
+ALTER TABLE [dbo].[Favouries]  WITH CHECK ADD FOREIGN KEY([user_id])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[News]  WITH CHECK ADD FOREIGN KEY([Admin_id])
+REFERENCES [dbo].[Admins] ([Id])
+GO
+ALTER TABLE [dbo].[OrderDetail]  WITH CHECK ADD FOREIGN KEY([order_id])
+REFERENCES [dbo].[Orders] ([Id])
+GO
+ALTER TABLE [dbo].[OrderDetail]  WITH CHECK ADD FOREIGN KEY([productColor_id])
+REFERENCES [dbo].[ProductColor] ([Id])
+GO
+ALTER TABLE [dbo].[OrderDetail]  WITH CHECK ADD FOREIGN KEY([product_id])
+REFERENCES [dbo].[Products] ([Id])
+GO
+ALTER TABLE [dbo].[OrderDetail]  WITH CHECK ADD FOREIGN KEY([productSize_id])
+REFERENCES [dbo].[ProductSize] ([Id])
+GO
+ALTER TABLE [dbo].[Orders]  WITH CHECK ADD FOREIGN KEY([user_id])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[Payment]  WITH CHECK ADD FOREIGN KEY([order_id])
+REFERENCES [dbo].[Orders] ([Id])
+GO
+ALTER TABLE [dbo].[Payment]  WITH CHECK ADD FOREIGN KEY([user_id])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[ProductColor]  WITH CHECK ADD FOREIGN KEY([product_id])
+REFERENCES [dbo].[Products] ([Id])
+GO
+ALTER TABLE [dbo].[ProductReview]  WITH CHECK ADD FOREIGN KEY([product_id])
+REFERENCES [dbo].[Products] ([Id])
+GO
+ALTER TABLE [dbo].[ProductReview]  WITH CHECK ADD FOREIGN KEY([user_id])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[Products]  WITH CHECK ADD FOREIGN KEY([category_id])
+REFERENCES [dbo].[Categories] ([Id])
+GO
+ALTER TABLE [dbo].[ProductSize]  WITH CHECK ADD FOREIGN KEY([productColor_id])
+REFERENCES [dbo].[ProductColor] ([Id])
+GO
+ALTER TABLE [dbo].[ProductSize]  WITH CHECK ADD FOREIGN KEY([size_id])
+REFERENCES [dbo].[Size] ([Id])
+GO
+ALTER TABLE [dbo].[UserCard]  WITH CHECK ADD FOREIGN KEY([user_id])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[UserInfo]  WITH CHECK ADD FOREIGN KEY([user_id])
+REFERENCES [dbo].[Users] ([Id])
+GO
