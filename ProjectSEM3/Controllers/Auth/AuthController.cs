@@ -36,11 +36,12 @@ namespace ProjectSEM3.Controllers.Auth
                 // hash pw and token
                 var token = BCrypt.Net.BCrypt.HashString(data.Email, 10);
                 var salt = BCrypt.Net.BCrypt.GenerateSalt(10);
-                var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password,salt);
+                var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password, salt);
                 // create new user and user info
                 var user = new User { Email = data.Email, Token = data.Email, Password = passHash };
                 await _context.Users.AddAsync(user);
-                var userInfo = new UserInfo { Gender = data.Gender, Birthday = data.Birthday, Name = data.FirstName + data.LastName };
+                await _context.SaveChangesAsync();
+                var userInfo = new UserInfo { Gender = data.Gender, Birthday = data.Birthday, Name = data.FirstName + data.LastName, UserId = user.Id };
                 await _context.UserInfos.AddAsync(userInfo);
                 // save user
                 await _context.SaveChangesAsync();
@@ -61,7 +62,8 @@ namespace ProjectSEM3.Controllers.Auth
                 var token = BCrypt.Net.BCrypt.HashString(data.email, 10);
                 var user = new User { Email = data.email, Token = data.email };
                 await _context.Users.AddAsync(user);
-                var userInfo = new UserInfo {  Name = data.family_name + data.given_name};
+                await _context.SaveChangesAsync();
+                var userInfo = new UserInfo { Name = data.family_name + data.given_name, UserId = user.Id };
                 await _context.UserInfos.AddAsync(userInfo);
                 // save user
                 await _context.SaveChangesAsync();
@@ -166,25 +168,29 @@ namespace ProjectSEM3.Controllers.Auth
         {
             // xac thuc danh tinh user
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-
             if (identity.IsAuthenticated)
             {
                 var userClaims = identity.Claims;
-                var Id = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-                var user = new UserData
+                var UserId = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+                var user = await _context.Users.Include(e => e.UserInfos).Where(c => c.Id == Convert.ToInt32(UserId)).FirstOrDefaultAsync();
+                /*var user = new UserData
                 {
-                    Id = Convert.ToInt32(Id),
-
+                    Id = Convert.ToInt32(UserId),
                     Email = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value
-
-                };
-
+                };*/
                 return Ok(user);
             }
             return Unauthorized();
         }
         
 
+        [HttpGet, Route("test-profile"),AllowAnonymous]
+        async public Task<IActionResult> GetProfileDemo(int? id)
+        {
+            var UInfo = await _context.UserInfos.Include(e => e.User).Where(e => e.UserId == id).FirstOrDefaultAsync();
+            if (UInfo == null) return NotFound();
+            return Ok(UInfo);
+        }
 
 
         [HttpPost, Route("check-register"), AllowAnonymous]

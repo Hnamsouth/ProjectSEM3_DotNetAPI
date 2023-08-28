@@ -74,12 +74,13 @@ namespace ProjectSEM3.Services
             return listResourcesResult.JsonObj.ToObject<Object>();
         }
 
-        async static public Task<string> DeleteImg (string? publicId)
+        async static public Task<bool> DeleteImg (string? publicId)
         {
             Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
-            var rs =  await cloudinary.DeleteResourcesAsync(publicId); 
-
-            return rs.Deleted.Values.ToString();
+            var check = await cloudinary.GetResourceAsync(publicId);
+            if(check.StatusCode == System.Net.HttpStatusCode.NotFound) return false;
+            await cloudinary.DeleteResourcesAsync(publicId);
+            return true;
         }
 
 

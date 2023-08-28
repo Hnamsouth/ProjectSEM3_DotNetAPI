@@ -90,7 +90,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 // use cors
-app.UseCors("AllowPostman");
+app.UseCors();
 
 app.Run();
 
