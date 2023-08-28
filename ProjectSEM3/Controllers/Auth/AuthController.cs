@@ -38,7 +38,7 @@ namespace ProjectSEM3.Controllers.Auth
                 var salt = BCrypt.Net.BCrypt.GenerateSalt(10);
                 var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password,salt);
                 // create new user and user info
-                var user = new User { Email = data.Email, Token = data.Email, Password = passHash };
+                var user = new User { Email = data.Email, Token = data.Email, Password = passHash ,Activate=true};
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
                 var userInfo = new UserInfo { Gender = data.Gender, Birthday = data.Birthday, Name = data.FirstName + data.LastName,UserId= user.Id };
@@ -60,7 +60,7 @@ namespace ProjectSEM3.Controllers.Auth
             {
                 // hash pw and token
                 var token = BCrypt.Net.BCrypt.HashString(data.email, 10);
-                var user = new User { Email = data.email, Token = data.email };
+                var user = new User { Email = data.email, Token = data.email, Activate = true };
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
                 var userInfo = new UserInfo {  Name = data.family_name + data.given_name,UserId= user.Id};
@@ -71,7 +71,7 @@ namespace ProjectSEM3.Controllers.Auth
                 // send verify email
                 _emailService.SendEmail(userInfo.Name, data.email, token);
 
-                return Ok(true);
+                return Ok(new UserData { Id = user.Id, Email = user.Email, Token = GJWT(user) });
             }
             return BadRequest(false);
         }
