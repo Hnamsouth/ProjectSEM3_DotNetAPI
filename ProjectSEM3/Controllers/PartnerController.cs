@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,15 +23,23 @@ namespace ProjectSEM3.Controllers
         }
 
         // GET: api/<CategoryController>
+        [HttpGet, Route("profile")]
+        async public Task<IActionResult> GetProfile(int id)
+        {
+            var partner = await _context.PartnersInfos.Include(e => e.Partners).Where(c => c.PartnersId == id).FirstOrDefaultAsync();
+            
+            return Ok(partner);
+        }
+
         [HttpGet]
         async public Task<IActionResult> Get(int? id)
         {
             if (id == null)
             {
-                var pns = await _context.Partners.ToListAsync();
+                var pns = await _context.Partners.Include(e => e.PartnersInfos).ToListAsync();
                 return Ok(pns);
             }
-            var pn = await _context.Partners.FindAsync(id);
+            var pn = await _context.Partners.Include(e => e.PartnersInfos).Where(c => c.Id == id).FirstOrDefaultAsync();
 
             if (pn == null) { return NotFound(); }
             return Ok(pn);
@@ -57,7 +66,7 @@ namespace ProjectSEM3.Controllers
             {
                 _context.Partners.Update(data);
                 await _context.SaveChangesAsync();
-                return NoContent();
+                return Ok(await _context.Partners.Include(e => e.PartnersInfos).Where(c => c.Id == data.Id).FirstOrDefaultAsync());
             }
             return BadRequest();
         }

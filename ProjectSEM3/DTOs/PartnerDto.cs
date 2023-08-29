@@ -9,9 +9,9 @@ namespace ProjectSEM3.DTOs
 
         public string RepresentativeName { get; set; } = null!;
 
-        public bool Type { get; set; }
+        public bool Type { get; set; } //1: personal, 2: company
 
-        public bool Status { get; set; }
+        public bool Status { get; set; } //1: cooperating, 2: stop cooperating
 
         public string? Description { get; set; }
 

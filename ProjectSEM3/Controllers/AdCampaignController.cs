@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
 using ProjectSEM3.Entities;
+using ProjectSEM3.Migrations;
 using ProjectSEM3.Services;
 
 namespace ProjectSEM3.Controllers
@@ -28,10 +30,10 @@ namespace ProjectSEM3.Controllers
         {
             if (id == null)
             {
-                var ads = await _context.AdCampaigns.ToListAsync();
+                var ads = await _context.AdCampaigns.Include(e => e.Partners).Include(e => e.Collection).ToListAsync();
                 return Ok(ads);
             }
-            var ad = await _context.AdCampaigns.FindAsync(id);
+            var ad = await _context.AdCampaigns.Include(e => e.Partners).Include(e => e.Collection).Where(c => c.Id == id).FirstOrDefaultAsync();
 
             if (ad == null) { return NotFound(); }
             return Ok(ad);
@@ -43,9 +45,16 @@ namespace ProjectSEM3.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.AdCampaigns.Add(new AdCampaign { Name = data.Name, Img = data.Img, Desciption = data.Desciption, OpenDate = data.OpenDate, EndDate = data.EndDate, PartnersId = data.PartnersId, CollectionId = data.CollectionId });
+                var adC = new AdCampaign { Name = data.Name, Img = data.Img, Desciption = data.Desciption, OpenDate = data.OpenDate, EndDate = data.EndDate, PartnersId = data.PartnersId, CollectionId = data.CollectionId };
+                _context.AdCampaigns.Add(adC);
+
+                var pclImg = await UploadImg.UploadStr(data.Img, "Ad-campaign", (data.Name).Trim(), "#PP" + data.Name.Trim());
+
+                adC.Img = pclImg.url;
                 await _context.SaveChangesAsync();
-                return Created($"/get?id={data.Id}", data);
+
+                var ad = await _context.AdCampaigns.Include(e => e.Partners).Include(e => e.Collection).Where(c => c.Id == adC.Id).FirstOrDefaultAsync();
+                return Created($"/get?id={data.Id}", ad);
             }
             return BadRequest();
         }
@@ -58,7 +67,7 @@ namespace ProjectSEM3.Controllers
             {
                 _context.AdCampaigns.Update(data);
                 await _context.SaveChangesAsync();
-                return NoContent();
+                return Ok(await _context.AdCampaigns.Include(e => e.Partners).Include(e => e.Collection).Where(c => c.Id == data.Id).FirstOrDefaultAsync());
             }
             return BadRequest();
         }

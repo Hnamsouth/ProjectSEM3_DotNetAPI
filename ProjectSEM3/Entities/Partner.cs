@@ -15,7 +15,7 @@ public partial class Partner
 
     public string? Description { get; set; }
 
-    public virtual ICollection<AdCampaign> AdCampaigns { get; set; } = new List<AdCampaign>();
+    public virtual ICollection<AdCampaign>? AdCampaigns { get; set; } = new List<AdCampaign>();
 
-    public virtual ICollection<PartnersInfo> PartnersInfos { get; set; } = new List<PartnersInfo>();
+    public virtual ICollection<PartnersInfo>? PartnersInfos { get; set; } = new List<PartnersInfo>();
 }
