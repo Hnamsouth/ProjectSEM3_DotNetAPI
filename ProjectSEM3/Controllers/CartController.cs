@@ -36,20 +36,67 @@ namespace ProjectSEM3.Controllers
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity.IsAuthenticated)
             {
-                var Id = identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-                var itemsInCart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(Id)).Select(e => new
+                var UserId = Convert.ToInt32(identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+                var data = await _context.Carts.Select(e => new
                 {
-                    Id = e.Id,
-                    buyQty = e.BuyQty,
-                    productSize = e.ProductSize,
-                    userId = e.UserId,
-                    product = e.ProductSize.ProductColor.Product
-                }).ToListAsync();
-                //List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
-                return Ok(itemsInCart);
+                    e.Id,
+                    e.BuyQty,
+                    e.UserId,
+                    e.ProductSizeId,
+                    ProductSize = new
+                    {
+                        e.ProductSize.Id,
+                        e.ProductSize.Qty,
+                        e.ProductSize.SizeId,
+                        e.ProductSize.ProductColorId,
+                        ProductColor = new
+                        {
+                            e.ProductSize.ProductColor.Id,
+                            e.ProductSize.ProductColor.Name,
+                            e.ProductSize.ProductColor.ProductId,
+                            e.ProductSize.ProductColor.Product,
+                            e.ProductSize.ProductColor.ProductColorImages
+
+                        }
+                    }
+                }).Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
+                return Ok(data);
             }
             return Unauthorized();
         }
+ 
+
+        [HttpPost]
+        async public Task<IActionResult> AddCart([FromQuery]int productSizeId, [FromQuery]int buyQty)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var UserId = Convert.ToInt32(identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+                var c = new Cart { UserId = UserId, ProductSizeId = productSizeId, BuyQty = buyQty };
+                await _context.Carts.AddAsync(c);
+                await _context.SaveChangesAsync();
+
+                var data = await _context.Carts.Select(e => new
+                {
+                    e.Id,e.BuyQty,e.UserId,e.ProductSizeId,
+                    ProductSize = new
+                    {
+                        e.ProductSize.Id,e.ProductSize.Qty,e.ProductSize.SizeId,e.ProductSize.ProductColorId,
+                        ProductColor = new
+                        {
+                            e.ProductSize.ProductColor.Id,e.ProductSize.ProductColor.Name,e.ProductSize.ProductColor.ProductId,e.ProductSize.ProductColor.Product,
+                            e.ProductSize.ProductColor.ProductColorImages
+                        }
+                    }
+                }).Where(e => e.Id == c.Id).FirstOrDefaultAsync();
+
+                return Ok(data);
+            }
+            return Unauthorized(new { authErr = true });
+        }
+
+        /*
         [HttpPost]
         [AllowAnonymous]
         async public Task<IActionResult> Create(int productSizeId)
@@ -63,8 +110,9 @@ namespace ProjectSEM3.Controllers
                 // var list = await _context.Favouries.ToListAsync();
                 return Ok(productSizeId);
             }
-            return Unauthorized();
+            return Unauthorized(new { status = false });
         }
+        */
         [HttpDelete]
         async public Task<IActionResult> Delete(int id)
         {

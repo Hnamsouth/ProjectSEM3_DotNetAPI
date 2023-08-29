@@ -172,12 +172,31 @@ namespace ProjectSEM3.Controllers.Auth
                 var userClaims = identity.Claims;
                 var UserId = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
                 var user= await _context.Users.Include(e=>e.UserInfos).Where(c => c.Id == Convert.ToInt32(UserId) ).FirstOrDefaultAsync();
-                /*var user = new UserData
+                var cart = await _context.Carts.Select(e => new
                 {
-                    Id = Convert.ToInt32(UserId),
-                    Email = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value
-                };*/
-                return Ok(user);
+                    e.Id,
+                    e.BuyQty,
+                    e.UserId,
+                    e.ProductSizeId,
+                    ProductSize = new
+                    {
+                        e.ProductSize.Id,
+                        e.ProductSize.Qty,
+                        e.ProductSize.SizeId,
+                        e.ProductSize.ProductColorId,
+                        ProductColor = new
+                        {
+                            e.ProductSize.ProductColor.Id,
+                            e.ProductSize.ProductColor.Name,
+                            e.ProductSize.ProductColor.ProductId,
+                            e.ProductSize.ProductColor.Product,
+                            e.ProductSize.ProductColor.ProductColorImages
+                        }
+                    }
+                }).Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
+                var favorite = await _context.Favouries.Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
+
+                return Ok(new { profile = user, cart, favorite });
             }
             return Unauthorized();
         }
