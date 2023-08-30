@@ -39,6 +39,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProjectSEM3.Entities.ProjectSem3Context>(
     opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("Azusever"))
+
 );
 
 // add authentication
@@ -62,6 +63,8 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SuperAdmin", policy => policy.RequireUserName("adidosadmin"));
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("Manager", policy => policy.RequireRole("Manager"));
+
     options.AddPolicy("Staff", policy => policy.RequireRole("Staff"));
 
     options.AddPolicy("Auth", policy => policy.RequireAuthenticatedUser());

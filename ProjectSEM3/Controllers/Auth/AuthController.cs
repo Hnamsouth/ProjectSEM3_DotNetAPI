@@ -64,6 +64,7 @@ namespace ProjectSEM3.Controllers.Auth
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
                 var userInfo = new UserInfo { Name = data.family_name + data.given_name, UserId = user.Id };
+
                 await _context.UserInfos.AddAsync(userInfo);
                 // save user
                 await _context.SaveChangesAsync();
@@ -221,8 +222,10 @@ namespace ProjectSEM3.Controllers.Auth
         {
 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null) return Unauthorized(new { CheckToken=false});
-            return Ok(new { CheckToken = true });
+            if (identity == null) return Unauthorized(new  { CheckToken = false });
+            return Ok(new  { CheckToken = true });
         }
+        
+
     }
 }

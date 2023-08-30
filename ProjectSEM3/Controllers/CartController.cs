@@ -8,7 +8,7 @@ using ProjectSEM3.Entities;
 using ProjectSEM3.Helpers;
 using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProjectSEM3.Controllers
 {
@@ -31,39 +31,39 @@ namespace ProjectSEM3.Controllers
         //}
 
         [HttpGet]
-        public async Task<IActionResult> GetByUserId(int userId)
+        async  public Task<IActionResult> GetByUserId()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity.IsAuthenticated)
             {
                 var Id = identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-                var itemsInCart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(Id)).Select(e => new {
-                    Id=e.Id,
-                    buyQty=e.BuyQty,
-                    productSize=e.ProductSize,
-                    product=e.ProductSize.ProductColor.Product
+                var itemsInCart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(Id)).Select(e => new
+                {
+                    Id = e.Id,
+                    buyQty = e.BuyQty,
+                    productSize = e.ProductSize,
+                    userId = e.UserId,
+                    product = e.ProductSize.ProductColor.Product
                 }).ToListAsync();
                 //List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
                 return Ok(itemsInCart);
-   
             }
             return Unauthorized();
-          
-
         }
-
         [HttpPost]
         [AllowAnonymous]
-        async public Task<IActionResult> Create(CartDto data)
+        async public Task<IActionResult> Create(int productSizeId)
         {
-            if (ModelState.IsValid)
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
             {
-                var cart = Mapper<CartDto, Cart>.Map(data);
-                await _context.Carts.AddAsync(cart);
+                var UserId = Convert.ToInt32(identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+                await _context.Carts.AddAsync(new Cart { UserId = UserId, ProductSizeId = productSizeId });
                 await _context.SaveChangesAsync();
-                return Ok("Created");
+                // var list = await _context.Favouries.ToListAsync();
+                return Ok(productSizeId);
             }
-            return BadRequest();
+            return Unauthorized();
         }
         [HttpDelete]
         async public Task<IActionResult> Delete(int id)

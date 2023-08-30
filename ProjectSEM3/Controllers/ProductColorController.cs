@@ -25,10 +25,10 @@ namespace ProjectSEM3.Controllers
         {
             if (id == null)
             {
-                var pcls = await _context.ProductColors.Include(e=>e.ProductColorImages).ToListAsync();
+                var pcls = await _context.ProductColors.Include(e=>e.ProductColorImages).Include(e => e.ProductSizes).ThenInclude(e=>e.Size).ToListAsync();
                 return Ok(pcls);
             }
-            var pcl= await _context.ProductColors.Include(e => e.ProductColorImages).Where(c=>c.ProductId == id).ToListAsync();
+            var pcl= await _context.ProductColors.Include(e => e.ProductColorImages).Include(e=>e.ProductSizes).ThenInclude(e => e.Size).Where(c=>c.ProductId == id).ToListAsync();
             if(pcl==null) return NotFound();
             return Ok(pcl);
         }
@@ -49,7 +49,7 @@ namespace ProjectSEM3.Controllers
                     await _context.SaveChangesAsync();
                     index++;
                 }
-                return Ok(new { pcl ,Img=await _context.ProductColorImages.Where(e=>e.ProductColorId.Equals(pcl.Id)).ToListAsync()});
+                return Ok(await _context.ProductColors.Include(e => e.ProductColorImages).Include(e => e.ProductSizes).ThenInclude(e => e.Size).Where(c => c.Id == pcl.Id).FirstOrDefaultAsync());
             }
             return BadRequest();
         }
@@ -61,9 +61,8 @@ namespace ProjectSEM3.Controllers
             {
                 var pcl= await _context.ProductColors.FindAsync(data.Id);
                 if(pcl==null) return NotFound();
-
-                var pclUD = new ProductColor { Id = data.Id, Name = data.Name };
-                 _context.ProductColors.Update(pclUD);
+                pcl.Name = data.Name;
+                 _context.ProductColors.Update(pcl);
                 await _context.SaveChangesAsync();
 
                 if(data.Img!=null)
@@ -77,12 +76,12 @@ namespace ProjectSEM3.Controllers
                         index++;
                     }
                 }
-                return Ok(new { pcl, Img = await _context.ProductColorImages.Where(e => e.ProductColorId.Equals(pcl.Id)).ToListAsync() });
+                return Ok(await _context.ProductColors.Include(e => e.ProductColorImages).Include(e => e.ProductSizes).ThenInclude(e => e.Size).Where(c => c.Id == pcl.Id).FirstOrDefaultAsync());
             }
             return BadRequest();
         }
 
-        [HttpDelete,Route("delete-img")]
+        [HttpPost,Route("delete-img")]
         async public Task<IActionResult> DeleteImg(ProductColorImage data)
         {
             if (ModelState.IsValid)
@@ -93,6 +92,7 @@ namespace ProjectSEM3.Controllers
                 _context.ProductColorImages.Remove(pclImg);
                 var check = await UploadImg.DeleteImg(data.PublicId);
                 if (!check) return NotFound(new {msg="Not found publicId !!!",status=false});
+                await _context.SaveChangesAsync();
                 return Ok(new { msg = "Delete done.", status = true });
             }
             return BadRequest();
