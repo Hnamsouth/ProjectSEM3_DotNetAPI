@@ -184,6 +184,7 @@ namespace ProjectSEM3.Controllers.Auth
                         e.ProductSize.Qty,
                         e.ProductSize.SizeId,
                         e.ProductSize.ProductColorId,
+                        e.ProductSize.Size,
                         ProductColor = new
                         {
                             e.ProductSize.ProductColor.Id,
@@ -195,8 +196,9 @@ namespace ProjectSEM3.Controllers.Auth
                     }
                 }).Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
                 var favorite = await _context.Favouries.Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
+                var order = await _context.Orders.Include(e => e.OrderDetails).Where(e => e.UserId == Convert.ToInt32(UserId)).ToListAsync();
 
-                return Ok(new { profile = user, cart, favorite });
+                return Ok(new { profile = user, cart, favorite, order });
             }
             return Unauthorized();
         }

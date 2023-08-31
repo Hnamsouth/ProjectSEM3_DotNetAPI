@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -212,6 +214,33 @@ namespace ProjectSEM3.Controllers
                 ToListAsync();
             if (product == null) return NotFound();
             return Ok(product);
+        }
+
+        [HttpGet,Route("search"),AllowAnonymous]
+        async public Task<IActionResult> Search (string search)
+        {
+            var s = search.ToLower();
+            var data = await _context.Products
+                .Where(e =>
+                    e.Name.ToLower().Contains(s) ||
+                    e.CategoryDetail.Name.ToLower().Contains(s) ||
+                    e.CategoryDetail.Category.Name.ToLower().Contains(s) ||
+                    e.ProductColors.Where(c=>c.Name.ToLower().Contains(s)).Count() > 0 ||
+                    e.Gender==(s.Equals("man") || s.Equals("male") ? 0 : s.Equals("female") || s.Equals("girl")?1:2) ||
+                    (e.Gender==0 && s.Equals("boy") && e.ProductForChildren.Any()) ||
+                     (e.Gender == 1 && s.Equals("girl") && e.ProductForChildren.Any()) ||
+                     e.Kindofsport.Name.ToLower().Contains(s)
+                ).Select(e => new
+                {
+                    e.Id,e.Name,e.Price,e.Description,e.Gender,e.OpenSale,e.Status,
+                    categoryDetail = new {e.CategoryDetail.Id,e.CategoryDetail.Name,e.CategoryDetail.Category},e.Kindofsport,
+                    productColors = e.ProductColors.Select(a => new{a.Id,a.Name,a.ProductId,a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new{s.Id,s.Qty,s.SizeId,s.ProductColorId, s.Size})
+                    }),
+                }).
+                ToListAsync();
+
+            return Ok(data);
         }
     }
 }

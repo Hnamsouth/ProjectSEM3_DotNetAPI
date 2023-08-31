@@ -7,6 +7,9 @@
       "type": "mssql",
       "connectionId": "ConnectionStrings:Azure",
       "dynamicId": null
+    },
+    "apis1": {
+      "type": "apis"
     }
   }
 }

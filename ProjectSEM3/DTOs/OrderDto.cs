@@ -5,21 +5,33 @@ namespace ProjectSEM3.DTOs
 {
 	public class OrderDto
 	{
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
 
-        public byte Status { get; set; }
+        public byte? Status { get; set; }
 
-        public string? ShipCode { get; set; }
+        public int? VoucherId { get; set; }
 
-        public int? UserId { get; set; }
+        public string Firstname { get; set; } = null!;
 
-        public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+        public string Laststname { get; set; } = null!;
+        public string Country { get; set; } = null!;
 
-        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        public string Street { get; set; } = null!;
 
-        public virtual User? User { get; set; }
+        public string City { get; set; } = null!;
+
+        public string District { get; set; } = null!;
+
+        public int Postcode { get; set; }
+
+        public string Phone { get; set; } = null!;
+
+        public string Email { get; set; } = null!;
+
+        public string? DeliveryMethod { get; set; } = null!;
+
     }
 }
 

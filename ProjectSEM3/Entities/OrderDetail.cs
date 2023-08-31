@@ -13,6 +13,8 @@ public partial class OrderDetail
 
     public int? ProductSizeId { get; set; }
 
+    public decimal Price { get; set; }
+
     public virtual Order? Order { get; set; }
 
     public virtual ProductSize? ProductSize { get; set; }

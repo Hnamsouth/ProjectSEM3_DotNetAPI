@@ -20,4 +20,6 @@ public partial class Voucher
     public DateTime? StartDate { get; set; }
 
     public DateTime? EndDate { get; set; }
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

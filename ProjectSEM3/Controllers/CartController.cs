@@ -10,6 +10,7 @@ using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.AspNetCore.Authorization;
 
+
 namespace ProjectSEM3.Controllers
 {
     [Route("api/cart")]
@@ -49,6 +50,7 @@ namespace ProjectSEM3.Controllers
                         e.ProductSize.Qty,
                         e.ProductSize.SizeId,
                         e.ProductSize.ProductColorId,
+                        e.ProductSize.Size,
                         ProductColor = new
                         {
                             e.ProductSize.ProductColor.Id,
@@ -73,20 +75,24 @@ namespace ProjectSEM3.Controllers
             if (identity != null)
             {
                 var UserId = Convert.ToInt32(identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+                // check cart
+                var checkCart = await _context.Carts.Where(e => e.ProductSizeId == productSizeId && e.UserId==UserId).FirstOrDefaultAsync();
+                if (checkCart != null) return Ok(new {existed=true});
+                // add new
                 var c = new Cart { UserId = UserId, ProductSizeId = productSizeId, BuyQty = buyQty };
                 await _context.Carts.AddAsync(c);
                 await _context.SaveChangesAsync();
-
                 var data = await _context.Carts.Select(e => new
                 {
                     e.Id,e.BuyQty,e.UserId,e.ProductSizeId,
                     ProductSize = new
                     {
-                        e.ProductSize.Id,e.ProductSize.Qty,e.ProductSize.SizeId,e.ProductSize.ProductColorId,
+                        e.ProductSize.Id,e.ProductSize.Qty,e.ProductSize.SizeId,e.ProductSize.ProductColorId,e.ProductSize.Size,
                         ProductColor = new
                         {
                             e.ProductSize.ProductColor.Id,e.ProductSize.ProductColor.Name,e.ProductSize.ProductColor.ProductId,e.ProductSize.ProductColor.Product,
-                            e.ProductSize.ProductColor.ProductColorImages
+                            e.ProductSize.ProductColor.ProductColorImages,
+
                         }
                     }
                 }).Where(e => e.Id == c.Id).FirstOrDefaultAsync();
@@ -96,23 +102,6 @@ namespace ProjectSEM3.Controllers
             return Unauthorized(new { authErr = true });
         }
 
-        /*
-        [HttpPost]
-        [AllowAnonymous]
-        async public Task<IActionResult> Create(int productSizeId)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
-            {
-                var UserId = Convert.ToInt32(identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
-                await _context.Carts.AddAsync(new Cart { UserId = UserId, ProductSizeId = productSizeId });
-                await _context.SaveChangesAsync();
-                // var list = await _context.Favouries.ToListAsync();
-                return Ok(productSizeId);
-            }
-            return Unauthorized(new { status = false });
-        }
-        */
         [HttpDelete]
         async public Task<IActionResult> Delete(int id)
         {
@@ -121,30 +110,34 @@ namespace ProjectSEM3.Controllers
             {
                 _context.Carts.Remove(cart);
                 await _context.SaveChangesAsync();
-                return NoContent();
+                return Ok(new {deleted=true});
             }
             return NotFound();
         }
         [HttpPut]
         async public Task<IActionResult> Update(CartDto data)
-            
         {
-            var cart = await _context.Carts.FindAsync(data.Id);
-
-            if (cart!=null)
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
             {
-                try
+                var cart = await _context.Carts.FindAsync(data.Id);
+                if (cart != null)
                 {
-                    var updatedCart = Mapper<CartDto, Cart>.Map(data, cart);
-                    _context.Carts.Update(updatedCart);
-                    await _context.SaveChangesAsync();
-                    return Ok("Updated");
-                } catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
+                    try
+                    {
+                        var updatedCart = Mapper<CartDto, Cart>.Map(data, cart);
+                        _context.Carts.Update(updatedCart);
+                        await _context.SaveChangesAsync();
+                        return Ok(new {updated=true});
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(ex.Message);
+                    }
                 }
+                return BadRequest("The product did not exist or something went wrong on our end, please try again!");
             }
-            return BadRequest("The product did not exist or something went wrong on our end, please try again!");
+            return Unauthorized();
         }
 
     }

@@ -253,18 +253,46 @@ public partial class ProjectSem3Context : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Orders__3214EC074A5FA77D");
 
+            entity.Property(e => e.City)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Country)
+                .HasMaxLength(100)
+                .IsUnicode(false);
             entity.Property(e => e.Date)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("date");
-            entity.Property(e => e.ShipCode)
+            entity.Property(e => e.DeliveryMethod)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.District)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Firstname)
                 .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("Ship_Code");
+                .IsUnicode(false);
+            entity.Property(e => e.Laststname)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Phone)
+                .HasMaxLength(40)
+                .IsUnicode(false);
+            entity.Property(e => e.Street)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__Orders__user_id__282DF8C2");
+
+            entity.HasOne(d => d.Voucher).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.VoucherId)
+                .HasConstraintName("FK__Orders__voucher___151B244E");
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>
@@ -274,6 +302,7 @@ public partial class ProjectSem3Context : DbContext
             entity.ToTable("OrderDetail");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.Price).HasColumnType("decimal(12, 4)");
             entity.Property(e => e.ProductSizeId).HasColumnName("product_size_id");
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
