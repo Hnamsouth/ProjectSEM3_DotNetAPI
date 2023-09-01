@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectSEM3.DTOs;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Helpers;
+using ProjectSEM3.Services;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -140,6 +141,15 @@ namespace ProjectSEM3.Controllers
             }
             return BadRequest();
         }
+
+        [HttpGet,AllowAnonymous,Route("capture")]
+        async public Task<IActionResult> GetCt(string? orderId)
+        {
+            var rs = await Paypal.RefundOrder(orderId);
+
+            return Ok(rs);
+        }
+
     }
 }
 
