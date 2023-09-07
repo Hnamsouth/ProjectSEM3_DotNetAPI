@@ -172,7 +172,7 @@ namespace ProjectSEM3.Controllers.Auth
                 var userClaims = identity.Claims;
                 var UserId = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
                 var user= await _context.Users.Include(e=>e.UserInfos).Where(c => c.Id == Convert.ToInt32(UserId) ).FirstOrDefaultAsync();
-                var cart = await _context.Carts.Select(e => new
+                var cart = await _context.Carts.Where(c => c.UserId == Convert.ToInt32(UserId)).Select(e => new
                 {
                     e.Id,
                     e.BuyQty,
@@ -192,11 +192,12 @@ namespace ProjectSEM3.Controllers.Auth
                             e.ProductSize.ProductColor.ProductId,
                             e.ProductSize.ProductColor.Product,
                             e.ProductSize.ProductColor.ProductColorImages
+
                         }
                     }
-                }).Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
+                }).ToListAsync();
                 var favorite = await _context.Favouries.Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
-                var order = await _context.Orders.Include(e => e.OrderDetails).Where(e => e.UserId == Convert.ToInt32(UserId)).ToListAsync();
+                var order = await _context.Orders.Include(e => e.OrderDetails).ThenInclude(e=>e.ProductSize).ThenInclude(e=>e.Size).Where(e => e.UserId == Convert.ToInt32(UserId)).ToListAsync();
 
                 return Ok(new { profile = user, cart, favorite, order });
             }

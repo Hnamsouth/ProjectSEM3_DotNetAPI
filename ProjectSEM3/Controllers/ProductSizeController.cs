@@ -79,6 +79,27 @@ namespace ProjectSEM3.Controllers
             }
             return NotFound();
         }
+
+        [HttpGet,Route("add-size")]
+        async public Task<IActionResult> AddSize()
+        {
+            var pcl = await _context.ProductColors.Where(e => e.ProductId > 12).ToListAsync();
+            var size = await _context.Sizes.Where(e=>e.Type==true).ToListAsync();
+            Random random= new Random();
+            pcl.ForEach(p =>
+            {
+                size.ForEach(async s =>
+                {
+                    if (random.Next(1, 7) != s.Id)
+                    {
+                        var ps = new ProductSize { Qty = random.Next(3, 50), SizeId = s.Id, ProductColorId = p.Id };
+                        await _context.ProductSizes.AddAsync(ps);
+                    }
+                });
+            });
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
     }
 }
 

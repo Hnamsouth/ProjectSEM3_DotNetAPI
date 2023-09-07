@@ -35,6 +35,10 @@ public partial class Order
 
     public int? VoucherId { get; set; }
 
+    public string OrderIdPaypal { get; set; } = null!;
+
+    public decimal Total { get; set; }
+
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();

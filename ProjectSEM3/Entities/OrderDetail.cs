@@ -15,6 +15,8 @@ public partial class OrderDetail
 
     public decimal Price { get; set; }
 
+    public string? Img { get; set; }
+
     public virtual Order? Order { get; set; }
 
     public virtual ProductSize? ProductSize { get; set; }

@@ -7,9 +7,8 @@ using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Helpers;
 using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.AspNetCore.Authorization;
-
+using ProjectSEM3.Services;
 
 namespace ProjectSEM3.Controllers
 {
@@ -23,13 +22,6 @@ namespace ProjectSEM3.Controllers
         {
             _context = context;
         }
-        //[HttpGet, Route("get")]
-        //async public Task<IActionResult> GetAll()
-        //{
-        //    var itemsInCart = await _context.Carts.ToListAsync();
-        //    List<CartDto> list = Mapper<Cart, CartDto>.MapList(itemsInCart);
-        //    return Ok(list);
-        //}
 
         [HttpGet]
         async  public Task<IActionResult> GetByUserId()
@@ -38,30 +30,32 @@ namespace ProjectSEM3.Controllers
             if (identity.IsAuthenticated)
             {
                 var UserId = Convert.ToInt32(identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
-                var data = await _context.Carts.Select(e => new
-                {
-                    e.Id,
-                    e.BuyQty,
-                    e.UserId,
-                    e.ProductSizeId,
-                    ProductSize = new
+                var data = await _context.Carts.
+                    Where(c => c.UserId == Convert.ToInt32(UserId)).
+                    Select(e => new
                     {
-                        e.ProductSize.Id,
-                        e.ProductSize.Qty,
-                        e.ProductSize.SizeId,
-                        e.ProductSize.ProductColorId,
-                        e.ProductSize.Size,
-                        ProductColor = new
+                        e.Id,
+                        e.BuyQty,
+                        e.UserId,
+                        e.ProductSizeId,
+                        ProductSize = new
                         {
-                            e.ProductSize.ProductColor.Id,
-                            e.ProductSize.ProductColor.Name,
-                            e.ProductSize.ProductColor.ProductId,
-                            e.ProductSize.ProductColor.Product,
-                            e.ProductSize.ProductColor.ProductColorImages
+                            e.ProductSize.Id,
+                            e.ProductSize.Qty,
+                            e.ProductSize.SizeId,
+                            e.ProductSize.ProductColorId,
+                            e.ProductSize.Size,
+                            ProductColor = new
+                            {
+                                e.ProductSize.ProductColor.Id,
+                                e.ProductSize.ProductColor.Name,
+                                e.ProductSize.ProductColor.ProductId,
+                                e.ProductSize.ProductColor.Product,
+                                e.ProductSize.ProductColor.ProductColorImages
 
+                            }
                         }
-                    }
-                }).Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
+                    }).ToListAsync();
                 return Ok(data);
             }
             return Unauthorized();
@@ -82,20 +76,31 @@ namespace ProjectSEM3.Controllers
                 var c = new Cart { UserId = UserId, ProductSizeId = productSizeId, BuyQty = buyQty };
                 await _context.Carts.AddAsync(c);
                 await _context.SaveChangesAsync();
-                var data = await _context.Carts.Select(e => new
-                {
-                    e.Id,e.BuyQty,e.UserId,e.ProductSizeId,
-                    ProductSize = new
+                var data = await _context.Carts.Where(e => e.Id == c.Id).
+                    Select(e => new
                     {
-                        e.ProductSize.Id,e.ProductSize.Qty,e.ProductSize.SizeId,e.ProductSize.ProductColorId,e.ProductSize.Size,
-                        ProductColor = new
+                        e.Id,
+                        e.BuyQty,
+                        e.UserId,
+                        e.ProductSizeId,
+                        ProductSize = new
                         {
-                            e.ProductSize.ProductColor.Id,e.ProductSize.ProductColor.Name,e.ProductSize.ProductColor.ProductId,e.ProductSize.ProductColor.Product,
-                            e.ProductSize.ProductColor.ProductColorImages,
+                            e.ProductSize.Id,
+                            e.ProductSize.Qty,
+                            e.ProductSize.SizeId,
+                            e.ProductSize.ProductColorId,
+                            e.ProductSize.Size,
+                            ProductColor = new
+                            {
+                                e.ProductSize.ProductColor.Id,
+                                e.ProductSize.ProductColor.Name,
+                                e.ProductSize.ProductColor.ProductId,
+                                e.ProductSize.ProductColor.Product,
+                                e.ProductSize.ProductColor.ProductColorImages
 
+                            }
                         }
-                    }
-                }).Where(e => e.Id == c.Id).FirstOrDefaultAsync();
+                    }).FirstOrDefaultAsync();
 
                 return Ok(data);
             }

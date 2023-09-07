@@ -70,11 +70,11 @@ public partial class ProjectSem3Context : DbContext
     public virtual DbSet<UserInfo> UserInfos { get; set; }
 
     public virtual DbSet<Voucher> Vouchers { get; set; }
-    /*
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=SOUTH\\SQLEXPRESS;Initial Catalog=Projectsem3;Integrated Security=True;TrustServerCertificate=True");
-    */
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AdCampaign>(entity =>
@@ -277,12 +277,16 @@ public partial class ProjectSem3Context : DbContext
             entity.Property(e => e.Laststname)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.OrderIdPaypal)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.Phone)
                 .HasMaxLength(40)
                 .IsUnicode(false);
             entity.Property(e => e.Street)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.Total).HasColumnType("decimal(14, 2)");
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
 
@@ -301,6 +305,9 @@ public partial class ProjectSem3Context : DbContext
 
             entity.ToTable("OrderDetail");
 
+            entity.Property(e => e.Img)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.Price).HasColumnType("decimal(12, 4)");
             entity.Property(e => e.ProductSizeId).HasColumnName("product_size_id");

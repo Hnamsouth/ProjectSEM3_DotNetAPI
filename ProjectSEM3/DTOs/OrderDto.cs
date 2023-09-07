@@ -31,6 +31,8 @@ namespace ProjectSEM3.DTOs
         public string Email { get; set; } = null!;
 
         public string? DeliveryMethod { get; set; } = null!;
+        public string OrderIdPaypal { get; set; } = null!;
+        public decimal Total { get; set; }
 
     }
 }

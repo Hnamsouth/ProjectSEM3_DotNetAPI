@@ -6,9 +6,7 @@ using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ProjectSEM3.DTOs;
-using ProjectSEM3.DTOs.Auth;
 using ProjectSEM3.Entities;
 using ProjectSEM3.Helpers;
 using ProjectSEM3.Services;
@@ -21,6 +19,9 @@ namespace ProjectSEM3.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
+        static public int STS_Published = 0;
+        static public int STS_Inactive = 1;
+        static public int STS_Scheduled = 2;
 
         private readonly ProjectSem3Context _context;
 
@@ -34,45 +35,52 @@ namespace ProjectSEM3.Controllers
         {
             if (id == null)
             {
-                var products = await _context.Products.
+                var products = await _context.Products.Where(e => e.Status == 0).
                 Select(e => new
                 {
-                    e.Id,e.Name,e.Price,e.Description,e.Gender,e.OpenSale,e.Status,
-                    categoryDetail = new
-                    {
-                        e.CategoryDetail.Id,e.CategoryDetail.Name,e.CategoryDetail.Category
-                    },
+                    e.Id,
+                    e.Name,
+                    e.Price,
+                    e.Description,
+                    e.Gender,
+                    e.OpenSale,
+                    e.Status,
+                    categoryDetail = new { e.CategoryDetail.Id, e.CategoryDetail.Name, e.CategoryDetail.Category },
                     e.Kindofsport,
                     productColors = e.ProductColors.Select(a => new
                     {
-                        a.Id,a.Name, a.ProductId,a.ProductColorImages,
-                        productSizes = a.ProductSizes.Select(s => new
-                        {
-                            s.Id,s.Qty,s.SizeId,s.ProductColorId,s.Size
-                        })
+                        a.Id,
+                        a.Name,
+                        a.ProductId,
+                        a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new { s.Id, s.Qty, s.SizeId, s.ProductColorId, s.Size })
                     }),
-                }).Where(e => e.Status == 0).ToListAsync();
+                }).ToListAsync();
                 return Ok(products);
             }
             var product = await _context.Products.
-                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).Select(e => new
+                Include(e => e.CategoryDetail).ThenInclude(c => c.Category).
+                Where(e=>e.Id == id && e.Status == 0).
+                Select(e => new
                 {
-                    e.Id,e.Name,e.Price,e.Description,e.Gender,e.OpenSale,e.Status,
-                    categoryDetail = new
-                    {
-                        e.CategoryDetail.Id,e.CategoryDetail.Name,e.CategoryDetail.Category
-                    },
+                    e.Id,
+                    e.Name,
+                    e.Price,
+                    e.Description,
+                    e.Gender,
+                    e.OpenSale,
+                    e.Status,
+                    categoryDetail = new { e.CategoryDetail.Id, e.CategoryDetail.Name, e.CategoryDetail.Category },
                     e.Kindofsport,
                     productColors = e.ProductColors.Select(a => new
                     {
-                        a.Id,a.Name, a.ProductId,a.ProductColorImages,
-                        productSizes = a.ProductSizes.Select(s => new
-                        {
-                            s.Id,s.Qty,s.SizeId,s.ProductColorId,s.Size
-                        })
+                        a.Id,
+                        a.Name,
+                        a.ProductId,
+                        a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new { s.Id, s.Qty, s.SizeId, s.ProductColorId, s.Size })
                     }),
-                }).
-                Where(e=>e.Id == id && e.Status == 0).FirstOrDefaultAsync();
+                }).FirstOrDefaultAsync();
             if (product == null) { return NotFound(); }
             return Ok(product);
         }
@@ -220,27 +228,76 @@ namespace ProjectSEM3.Controllers
         async public Task<IActionResult> Search (string search)
         {
             var s = search.ToLower();
-            var data = await _context.Products
-                .Where(e =>
-                    e.Name.ToLower().Contains(s) ||
-                    e.CategoryDetail.Name.ToLower().Contains(s) ||
-                    e.CategoryDetail.Category.Name.ToLower().Contains(s) ||
-                    e.ProductColors.Where(c=>c.Name.ToLower().Contains(s)).Count() > 0 ||
-                    e.Gender==(s.Equals("man") || s.Equals("male") ? 0 : s.Equals("female") || s.Equals("girl")?1:2) ||
-                    (e.Gender==0 && s.Equals("boy") && e.ProductForChildren.Any()) ||
-                     (e.Gender == 1 && s.Equals("girl") && e.ProductForChildren.Any()) ||
-                     e.Kindofsport.Name.ToLower().Contains(s)
-                ).Select(e => new
-                {
-                    e.Id,e.Name,e.Price,e.Description,e.Gender,e.OpenSale,e.Status,
-                    categoryDetail = new {e.CategoryDetail.Id,e.CategoryDetail.Name,e.CategoryDetail.Category},e.Kindofsport,
-                    productColors = e.ProductColors.Select(a => new{a.Id,a.Name,a.ProductId,a.ProductColorImages,
-                        productSizes = a.ProductSizes.Select(s => new{s.Id,s.Qty,s.SizeId,s.ProductColorId, s.Size})
-                    }),
-                }).
-                ToListAsync();
 
-            return Ok(data);
+            var query = _context.Products.AsQueryable();
+            if (!String.IsNullOrEmpty(s))
+            {
+                var rs = await _context.Products.Select(e => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.Price,
+                    e.Description,
+                    e.Gender,
+                    e.OpenSale,
+                    e.Status,
+                    categoryDetail = new { e.CategoryDetail.Id, e.CategoryDetail.Name, e.CategoryDetail.Category },
+                    e.Kindofsport,
+                    productColors = e.ProductColors.Select(a => new
+                    {
+                        a.Id,
+                        a.Name,
+                        a.ProductId,
+                        a.ProductColorImages,
+                        productSizes = a.ProductSizes.Select(s => new { s.Id, s.Qty, s.SizeId, s.ProductColorId, s.Size })
+                    }),
+                }).Where(e=>e.Name.Contains(s)).Take(5).ToListAsync();
+                return Ok(rs);
+            }
+            return NotFound();
+        }
+
+        [HttpGet,Route("Filter"),AllowAnonymous]
+        async public Task<IActionResult> Filter (string search)
+        {
+            var s = _context.Products.AsQueryable();
+           s = s.Where(e=>e.Name.ToLower().Contains(search));
+           s = s.Where(e => e.CategoryDetail.Name.Equals("Sneakers"));
+           s = s.Include(e => e.CategoryDetail);
+            var rs = s.ToList();
+            return Ok(rs);
+        }
+
+        private bool FilterCase(Product p, string search)
+        {
+            var s = search.ToLower();
+
+            var ctgr_dt = p.CategoryDetail.Name.ToLower().Contains(s);
+            var ctgr_dt2 = s.Contains(p.CategoryDetail.Name.ToLower());
+
+            var ctgr = p.CategoryDetail.Category.Name.ToLower().Contains(s);
+            var ctgr2 = s.Contains(p.CategoryDetail.Category.Name.ToLower());
+
+            var color = p.ProductColors.Where(c => c.Name.ToLower().Contains(s)).Count() > 0;
+            var color2 = p.ProductColors.Where(c => s.Contains(c.Name.ToLower())).Count() > 0;
+
+            var adult = p.Gender == (s.Equals("men") ? 0 : s.Equals("women") ? 1 : 2);
+            var adult2 = p.Gender == (s.Contains("men") ? 0 : s.Contains("women") ? 1 : 2);
+
+            var child = p.Gender == ((s.Equals("boy") && p.ProductForChildren.Any()) ? 0 : (s.Equals("girl") && p.ProductForChildren.Any()) ? 1 : 2);
+            var child2 = p.Gender == ((s.Contains("boy") && p.ProductForChildren.Any()) ? 0 : (s.Contains("girl") && p.ProductForChildren.Any()) ? 1 : 2);
+            var kos = p.Kindofsport.Name.ToLower().Contains(s);
+            /*
+             - ctgr dt / ctgr / gender
+             - ctgr dt / ctgr / color
+             - ctgr / gender
+             - ctgr / color
+             - ctgr dt
+             - ctgr
+             - gender
+             - color
+             */
+            return (ctgr_dt);
         }
     }
 }
