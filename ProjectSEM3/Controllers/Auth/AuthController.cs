@@ -38,7 +38,7 @@ namespace ProjectSEM3.Controllers.Auth
                 var salt = BCrypt.Net.BCrypt.GenerateSalt(10);
                 var passHash = BCrypt.Net.BCrypt.HashPassword(data.Password, salt);
                 // create new user and user info
-                var user = new User { Email = data.Email, Token = data.Email, Password = passHash };
+                var user = new User { Email = data.Email, Token = data.Email, Password = passHash, Activate = true };
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
                 var userInfo = new UserInfo { Gender = data.Gender, Birthday = data.Birthday, Name = data.FirstName + data.LastName, UserId = user.Id };
@@ -60,7 +60,7 @@ namespace ProjectSEM3.Controllers.Auth
             {
                 // hash pw and token
                 var token = BCrypt.Net.BCrypt.HashString(data.email, 10);
-                var user = new User { Email = data.email, Token = data.email };
+                var user = new User { Email = data.email, Token = data.email, Activate = true };
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
                 var userInfo = new UserInfo { Name = data.family_name + data.given_name, UserId = user.Id };
@@ -71,7 +71,7 @@ namespace ProjectSEM3.Controllers.Auth
                 // send verify email
                 _emailService.SendEmail(userInfo.Name, data.email, token);
 
-                return Ok(true);
+                return Ok(new UserData { Id = user.Id, Email = user.Email, Token = GJWT(user) });
             }
             return BadRequest(false);
         }
@@ -174,18 +174,36 @@ namespace ProjectSEM3.Controllers.Auth
                 var userClaims = identity.Claims;
                 var UserId = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
                 var user = await _context.Users.Include(e => e.UserInfos).Where(c => c.Id == Convert.ToInt32(UserId)).FirstOrDefaultAsync();
-                /*var user = new UserData
+                var cart = await _context.Carts.Select(e => new
                 {
-                    Id = Convert.ToInt32(UserId),
-                    Email = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value
-                };*/
-                return Ok(user);
+                    e.Id,
+                    e.BuyQty,
+                    e.UserId,
+                    e.ProductSizeId,
+                    ProductSize = new
+                    {
+                        e.ProductSize.Id,
+                        e.ProductSize.Qty,
+                        e.ProductSize.SizeId,
+                        e.ProductSize.ProductColorId,
+                        ProductColor = new
+                        {
+                            e.ProductSize.ProductColor.Id,
+                            e.ProductSize.ProductColor.Name,
+                            e.ProductSize.ProductColor.ProductId,
+                            e.ProductSize.ProductColor.Product,
+                            e.ProductSize.ProductColor.ProductColorImages
+                        }
+                    }
+                }).Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
+                var favorite = await _context.Favouries.Where(c => c.UserId == Convert.ToInt32(UserId)).ToListAsync();
+
+                return Ok(new { profile = user, cart, favorite });
             }
             return Unauthorized();
         }
-        
 
-        [HttpGet, Route("test-profile"),AllowAnonymous]
+        [HttpGet, Route("test-profile"), AllowAnonymous]
         async public Task<IActionResult> GetProfileDemo(int? id)
         {
             var UInfo = await _context.UserInfos.Include(e => e.User).Where(e => e.UserId == id).FirstOrDefaultAsync();
@@ -222,10 +240,9 @@ namespace ProjectSEM3.Controllers.Auth
         {
 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null) return Unauthorized(new  { CheckToken = false });
-            return Ok(new  { CheckToken = true });
+            if (identity == null) return Unauthorized(new { CheckToken = false });
+            return Ok(new { CheckToken = true });
         }
-        
 
     }
 }
